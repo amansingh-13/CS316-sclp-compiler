@@ -9,7 +9,7 @@ letter [a-zA-Z_]
 LINE \n
 %%
 
-int {  FUN("INT", 304) }
+int {  FUN("INTEGER", 304) }
 void {  FUN("VOID", 305) }
 float {  FUN("FLOAT", 306) }
 string {  FUN("STRING", 307) }
@@ -30,11 +30,11 @@ read   {  FUN("READ", 308) }
 
 {digit}+    {  FUN("INT_NUM", 308) } 
 {digit}+\.{digit}*|{digit}*\.{digit}+  {  FUN("FLOAT_NUM", 308) } 
-{letter}({letter}|{digit})+ {  FUN("NAME", 308) } 
+{letter}({letter}|{digit})* {  FUN("NAME", 308) } 
 
 \".*\"   {  FUN("STR_CONST", 308) } 
 
-
+\/\/.* {}
 \n {lineno++;}
 .
 

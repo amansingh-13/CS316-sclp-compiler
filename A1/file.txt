@@ -5,12 +5,12 @@ int bool
 in=tbool
 
 (,)
-print 
+print //fjfnkj 
 5.5
 5
 .
 .5
 5.
 __NAME
-
-"UY"
+"efj\kj"
+"U//Y"
