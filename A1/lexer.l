@@ -1,7 +1,8 @@
 %{
-    #include<stdio.h>
-    int lineno = 1;
-    #define FUN(a, b) {  printf("\tToken Name: %s\tLexeme: %s\tLineno: %d\n", a, yytext, lineno); return b; }
+	#include<stdio.h>
+	#include "yy.tab.h"
+	int lineno = 1;
+	#define FUN(a, b) {  printf("\tToken Name: %s\tLexeme: %s\tLineno: %d\n", a, yytext, lineno); return b; }
 %}
 
 digit [0-9]
@@ -9,30 +10,30 @@ letter [a-zA-Z_]
 LINE \n
 %%
 
-int	{ FUN("INTEGER", 304) }
-void	{ FUN("VOID", 305) }
-float	{ FUN("FLOAT", 306) }
-string	{ FUN("STRING", 307) }
-bool	{ FUN("BOOL", 308) }
-=	{ FUN("ASSIGN_OP", 308) }
-;	{ FUN("SEMICOLON", 308) }
-\(	{ FUN("LEFT_ROUND_BRACKET", 308) }
-\)	{ FUN("RIGHT_ROUND_BRACKET", 308) }
-\{	{ FUN("LEFT_CURLY_BRACKET", 308) }
-\}	{ FUN("RIGHT_CURLY_BRACKET", 308) }
-,	{ FUN("COMMA", 308) }
-print	{ FUN("WRITE", 308) }
-read	{ FUN("READ", 308) } 
-\+	{ FUN("PLUS", 308) } 
--	{ FUN("MINUS", 308) } 
-\*	{ FUN("MULT", 308) } 
-\/	{ FUN("DIV", 308) } 
+int	{ FUN("INTEGER", INTEGER) }
+void	{ FUN("VOID", VOID) }
+float	{ FUN("FLOAT", FLOAT) }
+string	{ FUN("STRING", STRING) }
+bool	{ FUN("BOOL", BOOL) }
+=	{ FUN("ASSIGN_OP", ASSIGN_OP) }
+;	{ FUN("SEMICOLON", SEMICOLON) }
+\(	{ FUN("LEFT_ROUND_BRACKET", LEFT_ROUND_BRACKET) }
+\)	{ FUN("RIGHT_ROUND_BRACKET", RIGHT_ROUND_BRACKET) }
+\{	{ FUN("LEFT_CURLY_BRACKET", LEFT_CURLY_BRACKET) }
+\}	{ FUN("RIGHT_CURLY_BRACKET", RIGHT_CURLY_BRACKET) }
+,	{ FUN("COMMA", COMMA) }
+print	{ FUN("WRITE", WRITE) }
+read	{ FUN("READ", READ) } 
+\+	{ FUN("PLUS", PLUS) } 
+-	{ FUN("MINUS", MINUS) } 
+\*	{ FUN("MULT", MULT) } 
+\/	{ FUN("DIV", DIV) } 
 
-{digit}+				{ FUN("INT_NUM", 308) } 
-{digit}+\.{digit}*|{digit}*\.{digit}+	{ FUN("FLOAT_NUM", 308) } 
-{letter}({letter}|{digit})*		{ FUN("NAME", 308) } 
+{digit}+				{ FUN("INT_NUM", INT_NUM) } 
+{digit}+\.{digit}*|{digit}*\.{digit}+	{ FUN("FLOAT_NUM", FLOAT_NUM) } 
+{letter}({letter}|{digit})*		{ FUN("NAME", NAME) } 
 
-\".*\"	{ FUN("STR_CONST", 308) } 
+\".*\"	{ FUN("STR_CONST", STR_CONST) } 
 
 \/\/.*	{}
 \n	{ lineno++; }
