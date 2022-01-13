@@ -503,11 +503,11 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "smth.l"
-#line 2 "smth.l"
+#line 1 "lexer.l"
+#line 2 "lexer.l"
     #include<stdio.h>
-    int lineno=1;
-    #define FUN(a, b) {  printf("\tToken Name: %s 	Lexeme: %s\tLineno: %d\n", a, yytext, lineno); return b; }
+    int lineno = 1;
+    #define FUN(a, b) {  printf("\tToken Name: %s\tLexeme: %s\tLineno: %d\n", a, yytext, lineno); return b; }
 #line 512 "lex.yy.c"
 
 #define INITIAL 0
@@ -726,7 +726,7 @@ YY_DECL
 		}
 
 	{
-#line 10 "smth.l"
+#line 10 "lexer.l"
 
 
 #line 733 "lex.yy.c"
@@ -788,133 +788,133 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 12 "smth.l"
-{  FUN("INTEGER", 304) }
+#line 12 "lexer.l"
+{ FUN("INTEGER", 304) }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 13 "smth.l"
-{  FUN("VOID", 305) }
+#line 13 "lexer.l"
+{ FUN("VOID", 305) }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 14 "smth.l"
-{  FUN("FLOAT", 306) }
+#line 14 "lexer.l"
+{ FUN("FLOAT", 306) }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 15 "smth.l"
-{  FUN("STRING", 307) }
+#line 15 "lexer.l"
+{ FUN("STRING", 307) }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 16 "smth.l"
-{  FUN("BOOL", 308) }
+#line 16 "lexer.l"
+{ FUN("BOOL", 308) }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 17 "smth.l"
-{  FUN("ASSIGN_OP", 308) }
+#line 17 "lexer.l"
+{ FUN("ASSIGN_OP", 308) }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 18 "smth.l"
-{  FUN("SEMICOLON", 308) }
+#line 18 "lexer.l"
+{ FUN("SEMICOLON", 308) }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 19 "smth.l"
-{  FUN("LEFT_ROUND_BRACKET", 308) }
+#line 19 "lexer.l"
+{ FUN("LEFT_ROUND_BRACKET", 308) }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 20 "smth.l"
-{  FUN("RIGHT_ROUND_BRACKET", 308) }
+#line 20 "lexer.l"
+{ FUN("RIGHT_ROUND_BRACKET", 308) }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 21 "smth.l"
-{  FUN("LEFT_CURLY_BRACKET", 308) }
+#line 21 "lexer.l"
+{ FUN("LEFT_CURLY_BRACKET", 308) }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 22 "smth.l"
-{  FUN("RIGHT_CURLY_BRACKET", 308) }
+#line 22 "lexer.l"
+{ FUN("RIGHT_CURLY_BRACKET", 308) }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 23 "smth.l"
-{  FUN("COMMA", 308) }
+#line 23 "lexer.l"
+{ FUN("COMMA", 308) }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 24 "smth.l"
-{  FUN("WRITE", 308) }
+#line 24 "lexer.l"
+{ FUN("WRITE", 308) }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 25 "smth.l"
-{  FUN("READ", 308) } 
+#line 25 "lexer.l"
+{ FUN("READ", 308) } 
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 26 "smth.l"
-{  FUN("PLUS", 308) } 
+#line 26 "lexer.l"
+{ FUN("PLUS", 308) } 
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 27 "smth.l"
-{  FUN("MINUS", 308) } 
+#line 27 "lexer.l"
+{ FUN("MINUS", 308) } 
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 28 "smth.l"
-{  FUN("MULT", 308) } 
+#line 28 "lexer.l"
+{ FUN("MULT", 308) } 
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 29 "smth.l"
-{  FUN("DIV", 308) } 
+#line 29 "lexer.l"
+{ FUN("DIV", 308) } 
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 31 "smth.l"
-{  FUN("INT_NUM", 308) } 
+#line 31 "lexer.l"
+{ FUN("INT_NUM", 308) } 
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 32 "smth.l"
-{  FUN("FLOAT_NUM", 308) } 
+#line 32 "lexer.l"
+{ FUN("FLOAT_NUM", 308) } 
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 33 "smth.l"
-{  FUN("NAME", 308) } 
+#line 33 "lexer.l"
+{ FUN("NAME", 308) } 
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 35 "smth.l"
-{  FUN("STR_CONST", 308) } 
+#line 35 "lexer.l"
+{ FUN("STR_CONST", 308) } 
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 37 "smth.l"
+#line 37 "lexer.l"
 {}
 	YY_BREAK
 case 24:
 /* rule 24 can match eol */
 YY_RULE_SETUP
-#line 38 "smth.l"
-{lineno++;}
+#line 38 "lexer.l"
+{ lineno++; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 39 "smth.l"
-
+#line 39 "lexer.l"
+{}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 41 "smth.l"
+#line 41 "lexer.l"
 ECHO;
 	YY_BREAK
 #line 921 "lex.yy.c"
@@ -1918,7 +1918,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 41 "smth.l"
+#line 41 "lexer.l"
 
 
 
