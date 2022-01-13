@@ -2,7 +2,7 @@
 	#include<stdio.h>
 	#include "y.tab.h"
 	int lineno = 1;
-	#define FUN(a, b) {  printf("\tToken Name: %s\tLexeme: %s\tLineno: %d\n", a, yytext, lineno); return b; }
+	#define FUN(a, b) { printf("\tToken Name: %s\tLexeme: %s\tLineno: %d\n", a, yytext, lineno); return b; }
 %}
 
 digit [0-9]
@@ -38,7 +38,7 @@ read	{ FUN("READ", READ) }
 \/\/.*	{}
 \n	{ lineno++; }
 [ \t\r\f]  {}
-.	{ printf("%s", yytext); exit(1); }
+.	{ fprintf(stderr, "%s", yytext); exit(1); }
 
 %%
 
