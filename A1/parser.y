@@ -146,7 +146,6 @@ int main(int argc, char* argv[]){
         }
     }
 
-    //printf("%c %c \n", filename[strlen(filename)-1], filename[strlen(filename)-2]);
     if(filename[strlen(filename)-1] != 'c' || filename[strlen(filename)-2] != '.'){
         fprintf(stderr, "Filename must end in .c\n");
         exit(1);
