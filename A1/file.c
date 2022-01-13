@@ -1,6 +1,6 @@
 int b;
 void main(){
-	a = -.5;
+	a = main();
 }
 //int
 //bool
