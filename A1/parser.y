@@ -140,7 +140,7 @@ constant_as_operand
 
 int main(int argc, char* argv[]){
     show_tokens = 0;
-    char* filename;
+    char* filename = NULL;
 
     for(int i=1; i<argc; i++){
         if(strcmp("--show-tokens", argv[i]) == 0){
@@ -151,7 +151,7 @@ int main(int argc, char* argv[]){
         }
     }
 
-    if(filename[strlen(filename)-1] != 'c' || filename[strlen(filename)-2] != '.'){
+    if(!filename || filename[strlen(filename)-1] != 'c' || filename[strlen(filename)-2] != '.'){
         fprintf(stderr, "Filename must end in .c\n");
         exit(1);
     }
