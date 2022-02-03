@@ -5,6 +5,8 @@
 extern FILE *yyin, *yyout;
 char *tok_file;
 int show_tokens;
+int yyerror(char*);
+int yylex();
 %}
 
 %token INTEGER VOID FLOAT STRING BOOL ASSIGN_OP SEMICOLON LEFT_ROUND_BRACKET RIGHT_ROUND_BRACKET LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET COMMA WRITE READ PLUS MINUS MULT DIV INT_NUM FLOAT_NUM NAME STR_CONST
@@ -157,7 +159,7 @@ int main(int argc, char* argv[]){
     yyin = fopen(filename, "r");
     
     if(show_tokens){
-        tok_file = malloc(strlen(filename)+5+1);
+        tok_file = (char*)malloc(strlen(filename)+5+1);
         strncpy(tok_file, filename, strlen(filename));
         strcat(tok_file, ".toks");
         yyout = fopen(tok_file, "w");
