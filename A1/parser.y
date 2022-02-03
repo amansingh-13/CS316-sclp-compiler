@@ -15,6 +15,7 @@ int show_tokens;
 
 program 
     : global_decl_statement_list func_def
+    | func_def
 ;
 
 global_decl_statement_list 
@@ -168,8 +169,8 @@ int main(int argc, char* argv[]){
 }
 
 int yyerror(char *mesg){
-    remove(tok_file);
-    fopen(tok_file, "w+");
+    //remove(tok_file);
+    //fopen(tok_file, "w+");
     fprintf(stderr, "%s\n", mesg);
     exit(1);
 }
