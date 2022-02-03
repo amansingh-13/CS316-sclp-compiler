@@ -2,7 +2,8 @@
 	#include<stdio.h>
 	#include "y.tab.h"
 	int lineno = 1;
-	#define FUN(a, b) { fprintf(yyout, "\tToken Name: %s\tLexeme: %s\tLineno: %d\n", a, yytext, lineno); return b; }
+	extern int show_tokens;
+	#define FUN(a, b) { if(show_tokens) {fprintf(yyout, "\tToken Name: %s\tLexeme: %s\tLineno: %d\n", a, yytext, lineno);} return b; }
 %}
 
 digit [0-9]
