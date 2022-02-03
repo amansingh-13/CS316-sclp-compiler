@@ -1,7 +1,10 @@
 
 int a;
+
+void x();
+
 void main(){
-	
-	print a; // print the value 0 because it is a global variable
-	
+	string c;
+	print c;
 }
+
