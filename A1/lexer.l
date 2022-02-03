@@ -36,7 +36,8 @@ read	{ FUN("READ", 308) }
 
 \/\/.*	{}
 \n	{ lineno++; }
-.	{}
+[ \t\r\f]  {}
+.	{ printf("%s", yytext); exit(1); }
 
 %%
 
