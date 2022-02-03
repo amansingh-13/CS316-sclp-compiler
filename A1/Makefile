@@ -1,5 +1,15 @@
-run:
+exp: lex.yy.o y.tab.o
+	gcc -o parser lex.yy.o y.tab.o -ly -ll 
+
+y.tab.o y.tab.h : parser.y 
+	yacc -dv parser.y 
+	gcc -c y.tab.c
+
+lex.yy.o : lexer.l y.tab.h
 	lex lexer.l
-	gcc -ll lex.yy.c
-	./a.out < file.txt
+	gcc -c lex.yy.c 
+
+clean:
+	rm -f lex.yy.* y.tab.* y.output a.out parser 
+
 	

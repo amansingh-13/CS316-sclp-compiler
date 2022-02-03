@@ -1,6 +1,6 @@
 %{
 	#include<stdio.h>
-	#include "yy.tab.h"
+	#include "y.tab.h"
 	int lineno = 1;
 	#define FUN(a, b) {  printf("\tToken Name: %s\tLexeme: %s\tLineno: %d\n", a, yytext, lineno); return b; }
 %}
