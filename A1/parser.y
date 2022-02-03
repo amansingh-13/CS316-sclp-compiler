@@ -169,8 +169,10 @@ int main(int argc, char* argv[]){
 }
 
 int yyerror(char *mesg){
-    //remove(tok_file);
-    //fopen(tok_file, "w+");
+    if(show_tokens){
+        remove(tok_file);
+        fopen(tok_file, "w+");
+    }
     fprintf(stderr, "%s\n", mesg);
     exit(1);
 }
