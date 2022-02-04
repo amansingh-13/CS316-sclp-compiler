@@ -35,7 +35,7 @@ read	{ FUN("READ", READ) }
 {digit}+\.{digit}*|{digit}*\.{digit}+	{ FUN("FLOAT_NUM", FLOAT_NUM) } 
 {letter}({letter}|{digit})*		{ FUN("NAME", NAME) } 
 
-\"[^("|\n|\r)]*\"	{ FUN("STR_CONST", STR_CONST) } 
+\"[^"\n\r]*\"	{ FUN("STR_CONST", STR_CONST) } 
 
 \/\/.*	{}
 \n	{ lineno++; }
