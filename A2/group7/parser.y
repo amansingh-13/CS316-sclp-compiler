@@ -141,36 +141,68 @@ variable_name
 ;
 
 print_statement
-    : WRITE expression SEMICOLON
+    : WRITE expression SEMICOLON	{   auto Ws = new Write_Stmt();
+					    Ws->expression = $<exp>2;
+					    $<stmt>$ = Ws;
+					}
 ;
 
 read_statement
-    : READ variable_name SEMICOLON
+    : READ variable_name SEMICOLON	{   auto Rs = new Read_Stmt();
+					    Rs->var_name = $<exp>2;
+					    $<stmt>$ = Rs;
+					}
 ;
 
 expression
-    : expression PLUS expression
-    | expression MINUS expression
-    | expression MULT expression
-    | expression DIV expression
-    | MINUS expression      %prec UMINUS
-    | LEFT_ROUND_BRACKET expression RIGHT_ROUND_BRACKET
-    | expression QUESTION_MARK expression COLON expression
-    | expression AND expression
-    | expression OR expression
-    | NOT expression
-    | rel_expression
-    | variable_as_operand
-    | constant_as_operand 
+    : expression PLUS expression	 { auto e = new Plus_Expr()  ; e->left = $<exp>1; e->right = $<exp>3; $<exp>$ = e; }
+    | expression MINUS expression	 { auto e = new Minus_Expr() ; e->left = $<exp>1; e->right = $<exp>3; $<exp>$ = e; }
+    | expression MULT expression	 { auto e = new Mult_Expr()  ; e->left = $<exp>1; e->right = $<exp>3; $<exp>$ = e; }
+    | expression DIV expression 	 { auto e = new Div_Expr()   ; e->left = $<exp>1; e->right = $<exp>3; $<exp>$ = e; }
+    | MINUS expression      %prec UMINUS { auto e = new UMinus_Expr(); e->expression = $<exp>2; $<exp>$ = e; }
+    | LEFT_ROUND_BRACKET expression RIGHT_ROUND_BRACKET		{ $<exp>$ = $<exp>2; }
+    | expression QUESTION_MARK expression COLON expression	{
+									// TODO
+								}
+    | expression AND expression  	 { auto e = new Boolean_Expr(); 
+					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("AND");
+					   $<exp>$ = e; 
+					 }         
+    | expression OR expression		 { auto e = new Boolean_Expr(); 
+					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("OR");
+					   $<exp>$ = e; 
+					 }
+    | NOT expression			 { auto e = new Not_Expr(); e->expression = $<exp>2; $<exp>$ = e; }
+    | rel_expression			 { $<exp>$ = $<exp>1; }
+    | variable_as_operand		 { $<exp>$ = $<exp>1; }
+    | constant_as_operand		 { $<exp>$ = $<exp>1; } 
 ;
 
 rel_expression
-    : expression LT expression
-    | expression LE expression
-    | expression GT expression
-    | expression GE expression
-    | expression NE expression
-    | expression EQ expression
+    : expression LT expression		 { auto e = new Relational_Expr(); 
+					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("LE");
+					   $<exp>$ = e; 
+					 }
+    | expression LE expression		 { auto e = new Relational_Expr(); 
+					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("LE");
+					   $<exp>$ = e; 
+					 }	
+    | expression GT expression		 { auto e = new Relational_Expr(); 
+					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("GT");
+					   $<exp>$ = e; 
+					 }
+    | expression GE expression		 { auto e = new Relational_Expr(); 
+					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("GE");
+					   $<exp>$ = e; 
+					 }
+    | expression NE expression		 { auto e = new Relational_Expr(); 
+					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("NE");
+					   $<exp>$ = e; 
+					 }
+    | expression EQ expression		 { auto e = new Relational_Expr(); 
+					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("EQ");
+					   $<exp>$ = e; 
+					 }
 
 constant_as_operand 
     : INT_NUM 
