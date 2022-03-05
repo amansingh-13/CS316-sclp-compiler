@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 extern FILE *yyin, *yyout;
 char *tok_file;
 int show_tokens;

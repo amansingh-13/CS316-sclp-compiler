@@ -1,5 +1,11 @@
-int x();
+void main(){
+    int a, b;
+    bool x;
+    a = b;
 
-int main(){
-    
+    read a;
+    while(x){
+        read b;
+        print a;
+    }
 }

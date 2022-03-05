@@ -1,0 +1,14 @@
+**PROCEDURE: main
+	Return Type: <void>
+	Formal Parameters:
+**BEGIN: Abstract Syntax Tree 
+         Asgn:
+           LHS (Name : a_<int>)
+           RHS (Name : b_<int>)
+         Read: Name : a_<int>
+         While: 
+           Condition (Name : x_<bool>)
+           Body (
+             Read: Name : b_<int>
+             Write: Name : a_<int>)
+**END: Abstract Syntax Tree 
