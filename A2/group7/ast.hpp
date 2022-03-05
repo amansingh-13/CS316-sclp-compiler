@@ -7,7 +7,9 @@ class AST{
 }
 
 class Expression_Ast : public AST {
-    virtual string print(int num_spaces)=0;
+public:
+	int type;
+	virtual string print(int num_spaces) = 0;
 }
 
 
@@ -50,12 +52,56 @@ public:
 class Write_Stmt_Ast : public Statement_Ast{
 
 public:
-    Expression_Ast* Expression_Ast;
+    Expression_Ast* expression;
 
     virtual string print(int num_spaces){
         string ws1 = string(num_spaces, " ");
         string total = ws1 + "Read: " \
-                     + var_name->print();
+                     + expression->print(num_spaces+4);
+        return total;
+    }
+}
+
+
+
+class Unary_Expr : public Expression_Ast {
+public:
+	virtual string print(int num_spaces) = 0;
+}
+
+class UMinus_Expr_Ast : public Unary_Expr {
+	Expression_Ast* expression;
+
+    virtual string print(int num_spaces){
+        string ws1 = string(num_spaces, " ");
+        string ws2 = string(num_spaces+2, " ");
+        string ret;
+        ret = print_type(expression->type);
+        string total = "Arith: Uminus"+ret+"\n" \
+                     + ws2 + "L_Opd (" \
+                     + expression->print(num_spaces+4) + ")";
+        return total;
+    }
+
+}
+
+
+class Ternary_Expr : public Expression_Ast {
+public:
+	virtual string print(int num_spaces) = 0;
+}
+
+class Conditional_Expr_Ast : public Ternary_Expr{
+public:
+    Expression_Ast* expression1;
+    Expression_Ast* expression2;
+    Expression_Ast* expression3;
+
+    virtual string print(int num_spaces){
+        string ws1 = string(num_spaces, " ");
+        string total = expression1->print() \
+                 + "True_Part ("+expression2->print()+")" \
+                 + "False_Part ("+expression3->print()+")";
         return total;
     }
 }
