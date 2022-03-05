@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
 
@@ -8,9 +9,20 @@ using namespace std;
 #define TYPE_BOOL   2
 #define TYPE_STRING 3
 
-class AST{
+// why are Expression and Statement inheriting from AST ? 
 
-};
+class AST {
+public:
+	vector<Statement*> statements;
+	string print_ast(){
+		string rv = "**BEGIN: Abstract Syntax Tree\n";
+		for(Statement* it : statements){
+			rv += it->print(9);
+		}
+		rv += "**END: Abstract Syntax Tree\n";
+		return rv;
+	}
+}
 
 class Expression : public AST {
 public:
@@ -29,10 +41,6 @@ public:
 	}
 };
 
-
-class Statement : public AST {
-    
-};
 
 class Base_Expr : public Expression {
 public:
@@ -197,6 +205,11 @@ public:
     }
 };
 
+
+class Statement : public AST {
+public:
+	virtual string print(int num_spaces) = 0;    
+};
 
 
 class Assignment_Stmt : public Statement{
