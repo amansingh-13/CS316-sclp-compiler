@@ -87,6 +87,11 @@ class Binary_Expr : public Expression {
 public:
 	Expression *left, *right;
 	virtual string print(int num_spaces) = 0;
+	virtual void infer_type(){
+		if(left->type == right->type){
+			
+		}
+	}
 };
 
 class Div_Expr : public Binary_Expr {
@@ -111,6 +116,7 @@ public:
                              + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")\n" ;
 		return total;
 	}	
+	
 };
 
 class Minus_Expr : public Binary_Expr {
