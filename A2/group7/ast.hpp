@@ -2,106 +2,244 @@
 #include <string>
 using namespace std;
 
+
+#define TYPE_INT    0
+#define TYPE_FLOAT  1
+#define TYPE_BOOL   2
+#define TYPE_STRING 3
+
 class AST{
 
-}
+};
 
-class Expression_Ast : public AST {
+class Expression : public AST {
 public:
 	int type;
 	virtual string print(int num_spaces) = 0;
-}
+	string print_type(){
+		string rv;
+		switch(type){
+			case(TYPE_INT)    : { rv = "<int>"   ; break; }
+			case(TYPE_FLOAT)  : { rv = "<float>" ; break; }
+			case(TYPE_BOOL)   : { rv = "<bool>"  ; break; }
+			case(TYPE_STRING) : { rv = "<string>"; break; }
+			default           : { return "err";  } // should be UNREACHABLE
+		}
+		return rv;
+	}
+};
 
 
-class Statement_Ast : public AST {
+class Statement : public AST {
     
-}
+};
 
-
-class Assignment_Stmt_Ast : public Statement_Ast{
-    
+class Base_Expr : public Expression {
 public:
-    Expression_Ast* LHS;
-    Expression_Ast* RHS;
+	string value;
+	virtual string print(int num_spaces) = 0;
+};
 
-    virtual string print(int num_spaces){
-        string ws1 = string(num_spaces, " ");
-        string ws2 = string(num_spaces+2, " ");
-        string total = ws1 + "Asgn:\n" \
-                     + ws2 + "LHS (" + LHS->print(num_spaces+4) + ")\n" \
-                     + ws2 + "RHS (" + RHS->print(num_spaces+4) + ")\n" ;
-
-        return total;
-    }
-}
-
-class Read_Stmt_Ast : public Statement_Ast{
+class Name_Expr : public Base_Expr {
 public:
-    Expression_Ast* var_name;
+	virtual string print(int num_spaces)
+	{
+		string rv = "Name : " + value + "_" + print_type();
+		return rv;
+	}
+};
 
-    virtual string print(int num_spaces){
-        string ws1 = string(num_spaces, " ");
-        string total = ws1 + "Read: " \
-                     + var_name->print(num_spaces+4);
-        return total;
-    }
-
-}
-
-
-class Write_Stmt_Ast : public Statement_Ast{
-
+class Number_Expr_Int : public Base_Expr {
 public:
-    Expression_Ast* expression;
+	virtual string print(int num_spaces)
+	{
+		int parsed_val = stoi(value); // TODO
+		return "Num : " + to_string(parsed_val) + "<int>";
+	}
+};
 
-    virtual string print(int num_spaces){
-        string ws1 = string(num_spaces, " ");
-        string total = ws1 + "Read: " \
-                     + expression->print(num_spaces+4);
-        return total;
-    }
-}
+class Number_Expr_Float : public Base_Expr {
+public:
+	virtual string print(int num_spaces)
+	{
+		float parsed_val = stof(value); // TODO
+		return "Num : " + to_string(parsed_val) + "<float>";
+	}
+};
 
+class String_Expr : public Base_Expr {
+public:
+	virtual string print(int num_spaces)
+	{
+		return "String : " + value + "<string>";
+	}
+};
 
+class Binary_Expr : public Expression {
+public:
+	Expression *left, *right;
+	virtual string print(int num_spaces) = 0;
+};
 
-class Unary_Expr : public Expression_Ast {
+class Div_Expr : public Binary_Expr {
+public:
+	virtual string print(int num_spaces){
+		string ws1 = string(num_spaces, ' ');
+        	string ws2 = string(num_spaces+2, ' ');
+        	string total = ws1 + "Arith: Div" + print_type() + "\n" \
+		             + ws2 + "L_Opd (" + left->print(num_spaces+4) + ")\n" \
+                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")\n" ;
+		return total;
+	}	
+};
+
+class Mult_Expr : public Binary_Expr {
+public:
+	virtual string print(int num_spaces){
+		string ws1 = string(num_spaces, ' ');
+        	string ws2 = string(num_spaces+2, ' ');
+        	string total = ws1 + "Arith: Mult" + print_type() + "\n" \
+		             + ws2 + "L_Opd (" + left->print(num_spaces+4) + ")\n" \
+                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")\n" ;
+		return total;
+	}	
+};
+
+class Minus_Expr : public Binary_Expr {
+public:
+	virtual string print(int num_spaces){
+		string ws1 = string(num_spaces, ' ');
+        	string ws2 = string(num_spaces+2, ' ');
+        	string total = ws1 + "Arith: Minus" + print_type() + "\n" \
+		             + ws2 + "L_Opd (" + left->print(num_spaces+4) + ")\n" \
+                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")\n" ;
+		return total;
+	}	
+};
+
+class Plus_Expr : public Binary_Expr {
+public:
+	virtual string print(int num_spaces){
+		string ws1 = string(num_spaces, ' ');
+        	string ws2 = string(num_spaces+2, ' ');
+        	string total = ws1 + "Arith: Plus" + print_type() + "\n" \
+		             + ws2 + "L_Opd (" + left->print(num_spaces+4) + ")\n" \
+                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")\n" ;
+		return total;
+	}	
+};
+
+class Boolean_Expr : public Binary_Expr {
+public:
+	string op;
+	virtual string print(int num_spaces){
+		string ws1 = string(num_spaces, ' ');
+        	string ws2 = string(num_spaces+2, ' ');
+        	string total = ws1 + "Condition: " + op + print_type() + "\n" \
+		             + ws2 + "L_Opd (" + left->print(num_spaces+4) + ")\n" \
+                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")\n" ;
+		return total;
+	}	
+};
+
+class Relational_Expr : public Binary_Expr {
+public:
+	string op;
+	virtual string print(int num_spaces){
+		string ws1 = string(num_spaces, ' ');
+        	string ws2 = string(num_spaces+2, ' ');
+        	string total = ws1 + "Condition: " + op + print_type() + "\n" \
+		             + ws2 + "L_Opd (" + left->print(num_spaces+4) + ")\n" \
+                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")\n" ;
+		return total;
+	}	
+};
+
+class Unary_Expr : public Expression {
 public:
 	virtual string print(int num_spaces) = 0;
-}
+};
 
-class UMinus_Expr_Ast : public Unary_Expr {
-	Expression_Ast* expression;
+class UMinus_Expr : public Unary_Expr {
+	Expression* expression;
 
     virtual string print(int num_spaces){
-        string ws1 = string(num_spaces, " ");
-        string ws2 = string(num_spaces+2, " ");
+        string ws1 = string(num_spaces, ' ');
+        string ws2 = string(num_spaces+2, ' ');
         string ret;
-        ret = print_type(expression->type);
+        ret = print_type();
         string total = "Arith: Uminus"+ret+"\n" \
                      + ws2 + "L_Opd (" \
                      + expression->print(num_spaces+4) + ")";
         return total;
     }
 
-}
+};
 
 
-class Ternary_Expr : public Expression_Ast {
+class Ternary_Expr : public Expression {
 public:
 	virtual string print(int num_spaces) = 0;
-}
+};
 
-class Conditional_Expr_Ast : public Ternary_Expr{
+class Conditional_Expr : public Ternary_Expr{
 public:
-    Expression_Ast* expression1;
-    Expression_Ast* expression2;
-    Expression_Ast* expression3;
+    Expression* expression1;
+    Expression* expression2;
+    Expression* expression3;
 
     virtual string print(int num_spaces){
-        string ws1 = string(num_spaces, " ");
-        string total = expression1->print() \
-                 + "True_Part ("+expression2->print()+")" \
-                 + "False_Part ("+expression3->print()+")";
+        string ws1 = string(num_spaces, ' ');
+        string total = expression1->print(num_spaces+4) \
+                 + "True_Part ("+expression2->print(num_spaces+4)+")" \
+                 + "False_Part ("+expression3->print(num_spaces+4)+")";
         return total;
     }
-}
+};
+
+
+
+class Assignment_Stmt : public Statement{
+    
+public:
+    Expression* LHS;
+    Expression* RHS;
+
+    virtual string print(int num_spaces){
+        string ws1 = string(num_spaces, ' ');
+        string ws2 = string(num_spaces+2, ' ');
+        string total = ws1 + "Asgn:\n" \
+                     + ws2 + "LHS (" + LHS->print(num_spaces+4) + ")\n" \
+                     + ws2 + "RHS (" + RHS->print(num_spaces+4) + ")\n" ;
+
+        return total;
+    }
+};
+
+class Read_Stmt : public Statement{
+public:
+    Expression* var_name;
+
+    virtual string print(int num_spaces){
+        string ws1 = string(num_spaces, ' ');
+        string total = ws1 + "Read: " \
+                     + var_name->print(num_spaces+4);
+        return total;
+    }
+
+};
+
+
+class Write_Stmt : public Statement{
+
+public:
+    Expression* expression;
+
+    virtual string print(int num_spaces){
+        string ws1 = string(num_spaces, ' ');
+        string total = ws1 + "Read: " \
+                     + expression->print(num_spaces+4);
+        return total;
+    }
+};
+

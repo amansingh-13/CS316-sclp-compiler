@@ -1,11 +1,5 @@
 void main(){
-    int a, b;
+    float a, b;
     bool x;
-    a = b;
-
-    read a;
-    while(x){
-        read b;
-        print a;
-    }
+    a = x ? a : b;
 }
