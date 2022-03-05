@@ -278,18 +278,20 @@ expression
                                     e->expression1 = $<exp>1;   e->expression2 = $<exp>3;   e->expression3 = $<exp>5;
                                     $<exp>$ = e;
 								}
-    | expression AND expression  	 { auto e = new Boolean_Expr(); 
-					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("AND");
-					   $<exp>$ = e; 
-					 }         
-    | expression OR expression		 { auto e = new Boolean_Expr(); 
-					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("OR");
-					   $<exp>$ = e; 
-					 }
-    | NOT expression			 { auto e = new Not_Expr(); e->expression = $<exp>2; $<exp>$ = e; }
-    | rel_expression			 { $<exp>$ = $<exp>1; }
-    | variable_as_operand		 { $<exp>$ = $<exp>1; }
-    | constant_as_operand		 { $<exp>$ = $<exp>1; } 
+    | expression AND expression { 
+                                    auto e = new Boolean_Expr(); 
+					                e->left = $<exp>1; e->right = $<exp>3; e->op = string("AND");
+					                $<exp>$ = e; 
+                                }
+    | expression OR expression	{
+                                    auto e = new Boolean_Expr(); 
+					                e->left = $<exp>1; e->right = $<exp>3; e->op = string("OR");
+				                    $<exp>$ = e; 
+					            }
+    | NOT expression			{ auto e = new Not_Expr(); e->expression = $<exp>2; $<exp>$ = e; }
+    | rel_expression			{ $<exp>$ = $<exp>1; }
+    | variable_as_operand		{ $<exp>$ = $<exp>1; }
+    | constant_as_operand		{ $<exp>$ = $<exp>1; } 
 ;
 
 rel_expression
