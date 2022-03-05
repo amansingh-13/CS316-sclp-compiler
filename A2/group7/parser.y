@@ -60,28 +60,64 @@ func_decl
 ;
 
 func_header
-    : named_type NAME 
+    : named_type var_decl_item { auto func = new Function(); 
+				 func->return_type = $<var_type>1;
+				 func->Name = string($<str>2);
+				 $<var_names>$ = func; }
 ;
 
 func_def 
-    : func_header LEFT_ROUND_BRACKET formal_param_list RIGHT_ROUND_BRACKET  LEFT_CURLY_BRACKET optional_local_var_decl_stmt_list statement_list   RIGHT_CURLY_BRACKET   {  $<stmtlist>$=$<stmtlist>7;  }
+    : func_header LEFT_ROUND_BRACKET formal_param_list RIGHT_ROUND_BRACKET  LEFT_CURLY_BRACKET optional_local_var_decl_stmt_list statement_list   RIGHT_CURLY_BRACKET   
+	{
+		
+		SymTab* locals = (SymTab *)$<var_names>3;
+		SymTab* params = (SymTab *)$<var_names>6;
+		for(auto vars : *params){
+		    auto ret = locals->insert(pair<string, int>(vars.first, vars.second));
+		    if (ret.second == false){
+			//TODO
+			yyerror("Variable declared more than once in the same scope");
+		    }
+		}
+
+		Function* func = (Function *)$<var_names>1;
+		func->stmtlist = $<stmtlist>7;
+		func->Local_Symtab = locals;
+		func->Param_List   = params;
+		
+		$<var_names>$ = func; // TODO
+	}
     | func_header LEFT_ROUND_BRACKET  RIGHT_ROUND_BRACKET  LEFT_CURLY_BRACKET optional_local_var_decl_stmt_list statement_list   RIGHT_CURLY_BRACKET                    {  $<stmtlist>$=$<stmtlist>6;  }
 ;
 
 formal_param_list
     : formal_param_list COMMA formal_param 
-    | formal_param 
+		{ 
+			SymTab* X = (SymTab *)$<var_names>1;
+			SymTab* Y = (SymTab *)$<var_names>3;
+
+			for(auto vars : *Y){
+			    auto ret = X->insert(pair<string, int>(vars.first, vars.second));
+			    if (ret.second == false){
+				//TODO
+				yyerror("Variable declared more than once in the same scope");
+			    }
+			}
+			delete Y; 
+        		$<var_names>$ = X;
+		}
+    | formal_param		{ $<var_names>$ = $<var_names>1; } 
 ;
 
 formal_param 
-    : param_type NAME
+    : param_type var_decl_item 	{ auto ret = new SymTab(); (*ret)[string($<str>2)] = $<var_type>1; $<var_names>$ = ret; }
 ;
 
 param_type 
-    : INTEGER 
-    | FLOAT 
-    | BOOL 
-    | STRING
+    : INTEGER                   {   $<var_type>$ = TYPE_INT;    }
+    | FLOAT                     {   $<var_type>$ = TYPE_FLOAT;    }
+    | BOOL                      {   $<var_type>$ = TYPE_BOOL;    }
+    | STRING                    {   $<var_type>$ = TYPE_STRING;    }
 ;
 
 optional_local_var_decl_stmt_list
