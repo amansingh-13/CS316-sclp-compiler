@@ -75,13 +75,27 @@ global_decl_statement_list
         delete Y;
         $<pointer>$ = X;
     }
-    | var_decl_stmt {    $<pointer>$ = $<pointer>1;   }
-    | func_decl 
+    | var_decl_stmt         {    $<pointer>$ = $<pointer>1;   }
+    | func_decl             
 ;
 
 func_decl 
-    : func_header LEFT_ROUND_BRACKET formal_param_list RIGHT_ROUND_BRACKET SEMICOLON    { yyerror("Function decl not allowed at this stage"); }
-    | func_header LEFT_ROUND_BRACKET RIGHT_ROUND_BRACKET SEMICOLON      { yyerror("Function decl not allowed at this stage"); }
+    : func_header LEFT_ROUND_BRACKET formal_param_list RIGHT_ROUND_BRACKET SEMICOLON    {
+		
+		Function* func = (Function *)$<pointer>1;
+        func->decl_or_def = IS_DECLARATION;	
+        SymTab* params = (SymTab *)$<pointer>3;
+        func->Param_List   = params;
+
+		$<pointer>$ = func; 
+	}
+    | func_header LEFT_ROUND_BRACKET RIGHT_ROUND_BRACKET SEMICOLON      {
+		
+		Function* func = (Function *)$<pointer>1;
+        func->decl_or_def = IS_DECLARATION;		
+		$<pointer>$ = func; 
+
+	}
 ;
 
 func_header
@@ -110,10 +124,11 @@ func_def
         cout<<func->stmtlist->print();
 		func->Local_Symtab = locals;
 		func->Param_List   = params;
+        func->decl_or_def = IS_DEFINITION;
 		
-		$<pointer>$ = func; // TODO
+		$<pointer>$ = func; 
 	}
-    | func_header LEFT_ROUND_BRACKET  RIGHT_ROUND_BRACKET  LEFT_CURLY_BRACKET optional_local_var_decl_stmt_list statement_list   RIGHT_CURLY_BRACKET                    {
+    | func_header LEFT_ROUND_BRACKET  RIGHT_ROUND_BRACKET  LEFT_CURLY_BRACKET optional_local_var_decl_stmt_list statement_list   RIGHT_CURLY_BRACKET  {
 		
 		SymTab* locals = (SymTab *)$<pointer>5;
 
@@ -123,7 +138,7 @@ func_def
 		func->Local_Symtab = locals;
 		func->Param_List   = NULL;
 		
-		$<pointer>$ = func; // TODO
+		$<pointer>$ = func; 
 	}
 ;
 
