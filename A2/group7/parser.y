@@ -2,13 +2,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "ast.hpp"
 
 extern FILE *yyin, *yyout;
 char *tok_file;
 int show_tokens;
 int yyerror(char*);
 int yylex();
+
 %}
+%union{
+    class AST* node;
+    class Expression* exp;
+    class Statement* stmt;
+    class Stmtlist* stmtlist;
+}
 
 %token INTEGER VOID FLOAT STRING BOOL ASSIGN_OP SEMICOLON LEFT_ROUND_BRACKET RIGHT_ROUND_BRACKET LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET COMMA WRITE READ PLUS MINUS MULT DIV 
 %token INT_NUM 
@@ -103,18 +111,25 @@ named_type
 ;
 
 statement_list
-    : statement_list statement 
-    | %empty
+    : statement_list statement  {
+                                     $<stmtlist>$ = $<stmtlist>1;
+                                     ($<stmtlist>$)->statements.push_back($<stmt>2);
+                                }
+    | %empty                    {    $<stmtlist>$ = new Stmtlist();    }
 ;
 
 statement:
-    assignment_statement
-    | print_statement
-    | read_statement
+    assignment_statement        {    $<stmt>$ = $<stmt>1;    }
+    | print_statement           {    $<stmt>$ = $<stmt>1;    }
+    | read_statement            {    $<stmt>$ = $<stmt>1;    }
 ;
 
 assignment_statement
-    : variable_as_operand ASSIGN_OP expression SEMICOLON
+    : variable_as_operand ASSIGN_OP expression SEMICOLON    {    auto As = new Assignment_Stmt();  
+                                                                 As->LHS = $<exp>1;
+                                                                 As->RHS = $<exp>3;
+                                                                 $<stmt>$ = As;
+                                                            }
 ;
 
 variable_as_operand

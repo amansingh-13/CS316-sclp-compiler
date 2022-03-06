@@ -11,18 +11,11 @@ using namespace std;
 
 // why are Expression and Statement inheriting from AST ? 
 
+
 class AST {
 public:
-	vector<Statement*> statements;
-	string print_ast(){
-		string rv = "**BEGIN: Abstract Syntax Tree\n";
-		for(Statement* it : statements){
-			rv += it->print(9);
-		}
-		rv += "**END: Abstract Syntax Tree\n";
-		return rv;
-	}
-}
+	virtual string print(int num_spaces) = 0;    
+};
 
 class Expression : public AST {
 public:
@@ -262,3 +255,15 @@ public:
     }
 };
 
+class Stmtlist : public AST {
+public:
+	vector<Statement*> statements;
+	virtual string print(int num_spaces=9){
+		string rv = "**BEGIN: Abstract Syntax Tree\n";
+		for(Statement* it : statements){
+			rv += it->print(num_spaces);
+		}
+		rv += "**END: Abstract Syntax Tree\n";
+		return rv;
+	}
+};
