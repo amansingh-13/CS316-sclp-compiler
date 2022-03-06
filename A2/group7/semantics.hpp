@@ -14,6 +14,6 @@ public:
 
 class Program{
 public:
-    SymTab Global_Symtab;
+    SymTab* Global_Symtab;
     vector<Function*> functions;
 };

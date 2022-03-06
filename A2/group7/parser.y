@@ -20,7 +20,7 @@ int yylex();
     class Stmtlist* stmtlist;
     char* str;
     int var_type;
-    void* var_names;
+    void* pointer;
 }
 
 %token INTEGER VOID FLOAT STRING BOOL ASSIGN_OP SEMICOLON LEFT_ROUND_BRACKET RIGHT_ROUND_BRACKET LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET COMMA WRITE READ PLUS MINUS MULT DIV 
@@ -43,35 +43,60 @@ int yylex();
 %%
 
 program 
-    : global_decl_statement_list func_def   { $<stmtlist>$=$<stmtlist>2;  cout << $<stmtlist>$->print(); }
-    | func_def                              { $<stmtlist>$=$<stmtlist>1;  cout << $<stmtlist>$->print(); }
+    : global_decl_statement_list func_def   { 
+        auto P = new Program();
+        P->Global_Symtab = (SymTab *)$<pointer>1;
+        P->functions = vector<Function*>();
+        P->functions.push_back((Function *)$<pointer>2);
+        $<pointer>$ = P;
+     }
+    | func_def                              { 
+        auto P = new Program();
+        P->Global_Symtab = new SymTab();
+        P->functions = vector<Function*>();
+        P->functions.push_back((Function *)$<pointer>1);
+        $<pointer>$ = P;
+     }
 ;
 
 global_decl_statement_list 
     : global_decl_statement_list func_decl
-    | global_decl_statement_list var_decl_stmt 
-    | var_decl_stmt 
+    | global_decl_statement_list var_decl_stmt {
+        SymTab* X = (SymTab *)$<pointer>1;
+        SymTab* Y = (SymTab *)$<pointer>2;
+
+        for(auto vars : *Y){
+            auto ret = X->insert(pair<string, int>(vars.first, vars.second));
+            if (ret.second == false){
+                //TODO
+                yyerror("Variable declared more than once in the same scope");
+            }
+        }
+        delete Y;
+        $<pointer>$ = X;
+    }
+    | var_decl_stmt {    $<pointer>$ = $<pointer>1;   }
     | func_decl 
 ;
 
 func_decl 
-    : func_header LEFT_ROUND_BRACKET formal_param_list RIGHT_ROUND_BRACKET SEMICOLON
-    | func_header LEFT_ROUND_BRACKET RIGHT_ROUND_BRACKET SEMICOLON
+    : func_header LEFT_ROUND_BRACKET formal_param_list RIGHT_ROUND_BRACKET SEMICOLON    { yyerror("Function decl not allowed at this stage"); }
+    | func_header LEFT_ROUND_BRACKET RIGHT_ROUND_BRACKET SEMICOLON      { yyerror("Function decl not allowed at this stage"); }
 ;
 
 func_header
     : named_type var_decl_item { auto func = new Function(); 
 				 func->return_type = $<var_type>1;
 				 func->Name = string($<str>2);
-				 $<var_names>$ = func; }
+				 $<pointer>$ = func; }
 ;
 
 func_def 
     : func_header LEFT_ROUND_BRACKET formal_param_list RIGHT_ROUND_BRACKET  LEFT_CURLY_BRACKET optional_local_var_decl_stmt_list statement_list   RIGHT_CURLY_BRACKET   
 	{
 		
-		SymTab* locals = (SymTab *)$<var_names>3;
-		SymTab* params = (SymTab *)$<var_names>6;
+		SymTab* locals = (SymTab *)$<pointer>6;
+		SymTab* params = (SymTab *)$<pointer>3;
 		for(auto vars : *params){
 		    auto ret = locals->insert(pair<string, int>(vars.first, vars.second));
 		    if (ret.second == false){
@@ -80,21 +105,33 @@ func_def
 		    }
 		}
 
-		Function* func = (Function *)$<var_names>1;
+		Function* func = (Function *)$<pointer>1;
 		func->stmtlist = $<stmtlist>7;
+        cout<<func->stmtlist->print();
 		func->Local_Symtab = locals;
 		func->Param_List   = params;
 		
-		$<var_names>$ = func; // TODO
+		$<pointer>$ = func; // TODO
 	}
-    | func_header LEFT_ROUND_BRACKET  RIGHT_ROUND_BRACKET  LEFT_CURLY_BRACKET optional_local_var_decl_stmt_list statement_list   RIGHT_CURLY_BRACKET                    {  $<stmtlist>$=$<stmtlist>6;  }
+    | func_header LEFT_ROUND_BRACKET  RIGHT_ROUND_BRACKET  LEFT_CURLY_BRACKET optional_local_var_decl_stmt_list statement_list   RIGHT_CURLY_BRACKET                    {
+		
+		SymTab* locals = (SymTab *)$<pointer>5;
+
+		Function* func = (Function *)$<pointer>1;
+		func->stmtlist = $<stmtlist>6;
+        cout<<func->stmtlist->print();
+		func->Local_Symtab = locals;
+		func->Param_List   = NULL;
+		
+		$<pointer>$ = func; // TODO
+	}
 ;
 
 formal_param_list
     : formal_param_list COMMA formal_param 
 		{ 
-			SymTab* X = (SymTab *)$<var_names>1;
-			SymTab* Y = (SymTab *)$<var_names>3;
+			SymTab* X = (SymTab *)$<pointer>1;
+			SymTab* Y = (SymTab *)$<pointer>3;
 
 			for(auto vars : *Y){
 			    auto ret = X->insert(pair<string, int>(vars.first, vars.second));
@@ -104,13 +141,13 @@ formal_param_list
 			    }
 			}
 			delete Y; 
-        		$<var_names>$ = X;
+        		$<pointer>$ = X;
 		}
-    | formal_param		{ $<var_names>$ = $<var_names>1; } 
+    | formal_param		{ $<pointer>$ = $<pointer>1; } 
 ;
 
 formal_param 
-    : param_type var_decl_item 	{ auto ret = new SymTab(); (*ret)[string($<str>2)] = $<var_type>1; $<var_names>$ = ret; }
+    : param_type var_decl_item 	{ auto ret = new SymTab(); (*ret)[string($<str>2)] = $<var_type>1; $<pointer>$ = ret; }
 ;
 
 param_type 
@@ -121,15 +158,15 @@ param_type
 ;
 
 optional_local_var_decl_stmt_list
-    : %empty                                        {    $<var_names>$ = new SymTab();   }
-    | var_decl_stmt_list                            {    $<var_names>$ = $<var_names>1;   }
+    : %empty                                        {    $<pointer>$ = new SymTab();   }
+    | var_decl_stmt_list                            {    $<pointer>$ = $<pointer>1;   }
 ;
 
 var_decl_stmt_list
-    : var_decl_stmt                                 {    $<var_names>$ = $<var_names>1;   }
+    : var_decl_stmt                                 {    $<pointer>$ = $<pointer>1;   }
     | var_decl_stmt_list var_decl_stmt {
-        SymTab* X = (SymTab *)$<var_names>1;
-        SymTab* Y = (SymTab *)$<var_names>2;
+        SymTab* X = (SymTab *)$<pointer>1;
+        SymTab* Y = (SymTab *)$<pointer>2;
 
         for(auto vars : *Y){
             auto ret = X->insert(pair<string, int>(vars.first, vars.second));
@@ -139,14 +176,14 @@ var_decl_stmt_list
             }
         }
         delete Y;
-        $<var_names>$ = X;
+        $<pointer>$ = X;
     }
 ;
 
 var_decl_stmt
     : named_type var_decl_item_list SEMICOLON {
         auto X = new SymTab();
-        vector<string>* K = (vector<string>*)$<var_names>2;
+        vector<string>* K = (vector<string>*)$<pointer>2;
         int type = $<var_type>1;
         for(auto var_name : *K){
             auto ret = X->insert(pair<string, int>(var_name, type));
@@ -156,20 +193,20 @@ var_decl_stmt
             }
         }
         delete K;
-        $<var_names>$ = X;
+        $<pointer>$ = X;
     }
 ;
 
 var_decl_item_list
     : var_decl_item_list COMMA var_decl_item   {   
-                                    vector<string>* K = (vector<string>*)$<var_names>1;
+                                    vector<string>* K = (vector<string>*)$<pointer>1;
                                     K->push_back(string($<str>3));
-                                    $<var_names>$ = K;
+                                    $<pointer>$ = K;
                                 }
     | var_decl_item             {   
                                     auto K = new vector<string>;
                                     K->push_back(string($<str>1));
-                                    $<var_names>$ = K;
+                                    $<pointer>$ = K;
                                 }
 ;
 
