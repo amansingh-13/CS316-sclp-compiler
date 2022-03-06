@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "ast.hpp"
+#include "semantics.hpp"
+#include <string>
+using namespace std;
 
 extern FILE *yyin, *yyout;
 char *tok_file;
@@ -16,6 +18,9 @@ int yylex();
     class Expression* exp;
     class Statement* stmt;
     class Stmtlist* stmtlist;
+    char* str;
+    int var_type;
+    void* var_names;
 }
 
 %token INTEGER VOID FLOAT STRING BOOL ASSIGN_OP SEMICOLON LEFT_ROUND_BRACKET RIGHT_ROUND_BRACKET LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET COMMA WRITE READ PLUS MINUS MULT DIV 
@@ -38,8 +43,8 @@ int yylex();
 %%
 
 program 
-    : global_decl_statement_list func_def
-    | func_def
+    : global_decl_statement_list func_def   { $<stmtlist>$=$<stmtlist>2;  cout << $<stmtlist>$->print(); }
+    | func_def                              { $<stmtlist>$=$<stmtlist>1;  cout << $<stmtlist>$->print(); }
 ;
 
 global_decl_statement_list 
@@ -59,8 +64,8 @@ func_header
 ;
 
 func_def 
-    : func_header LEFT_ROUND_BRACKET formal_param_list RIGHT_ROUND_BRACKET  LEFT_CURLY_BRACKET optional_local_var_decl_stmt_list statement_list   RIGHT_CURLY_BRACKET 
-    | func_header LEFT_ROUND_BRACKET  RIGHT_ROUND_BRACKET  LEFT_CURLY_BRACKET optional_local_var_decl_stmt_list statement_list   RIGHT_CURLY_BRACKET 
+    : func_header LEFT_ROUND_BRACKET formal_param_list RIGHT_ROUND_BRACKET  LEFT_CURLY_BRACKET optional_local_var_decl_stmt_list statement_list   RIGHT_CURLY_BRACKET   {  $<stmtlist>$=$<stmtlist>7;  }
+    | func_header LEFT_ROUND_BRACKET  RIGHT_ROUND_BRACKET  LEFT_CURLY_BRACKET optional_local_var_decl_stmt_list statement_list   RIGHT_CURLY_BRACKET                    {  $<stmtlist>$=$<stmtlist>6;  }
 ;
 
 formal_param_list
@@ -80,34 +85,68 @@ param_type
 ;
 
 optional_local_var_decl_stmt_list
-    : %empty
-    | var_decl_stmt_list 
+    : %empty                                        {    $<var_names>$ = new SymTab();   }
+    | var_decl_stmt_list                            {    $<var_names>$ = $<var_names>1;   }
 ;
 
 var_decl_stmt_list
-    : var_decl_stmt
-    | var_decl_stmt_list var_decl_stmt
+    : var_decl_stmt                                 {    $<var_names>$ = $<var_names>1;   }
+    | var_decl_stmt_list var_decl_stmt {
+        SymTab* X = (SymTab *)$<var_names>1;
+        SymTab* Y = (SymTab *)$<var_names>2;
+
+        for(auto vars : *Y){
+            auto ret = X->insert(pair<string, int>(vars.first, vars.second));
+            if (ret.second == false){
+                //TODO
+                yyerror("Variable declared more than once in the same scope");
+            }
+        }
+        delete Y;
+        $<var_names>$ = X;
+    }
 ;
 
 var_decl_stmt
-    : named_type var_decl_item_list SEMICOLON
+    : named_type var_decl_item_list SEMICOLON {
+        auto X = new SymTab();
+        vector<string>* K = (vector<string>*)$<var_names>2;
+        int type = $<var_type>1;
+        for(auto var_name : *K){
+            auto ret = X->insert(pair<string, int>(var_name, type));
+            if (ret.second == false){
+                //TODO
+                yyerror("Variable declared more than once in the same scope");
+            }
+        }
+        delete K;
+        $<var_names>$ = X;
+    }
 ;
 
 var_decl_item_list
-    : var_decl_item_list COMMA var_decl_item 
-    | var_decl_item
+    : var_decl_item_list COMMA var_decl_item   {   
+                                    vector<string>* K = (vector<string>*)$<var_names>1;
+                                    K->push_back(string($<str>3));
+                                    $<var_names>$ = K;
+                                }
+    | var_decl_item             {   
+                                    auto K = new vector<string>;
+                                    K->push_back(string($<str>1));
+                                    $<var_names>$ = K;
+                                }
 ;
 
 var_decl_item 
-    : NAME 
+    : NAME                      {  $<str>$ = yylval.str ;  }
 ;
 
 named_type 
-    : INTEGER 
-    | FLOAT 
-    | VOID
-    | BOOL 
-    | STRING
+    : INTEGER                   {   $<var_type>$ = TYPE_INT;    }
+    | FLOAT                     {   $<var_type>$ = TYPE_FLOAT;    }
+    | VOID                      {   $<var_type>$ = TYPE_VOID;    }
+    | BOOL                      {   $<var_type>$ = TYPE_BOOL;    }
+    | STRING                    {   $<var_type>$ = TYPE_STRING;    }
 ;
 
 statement_list
@@ -133,11 +172,11 @@ assignment_statement
 ;
 
 variable_as_operand
-    : variable_name 
+    : variable_name     {  $<exp>$ = $<exp>1;     }
 ;
 
 variable_name
-    : NAME 
+    : NAME              {  auto i = new Name_Expr();  i->value = string(yylval.str);  $<exp>$ = i;   }
 ;
 
 print_statement
@@ -162,7 +201,9 @@ expression
     | MINUS expression      %prec UMINUS { auto e = new UMinus_Expr(); e->expression = $<exp>2; $<exp>$ = e; }
     | LEFT_ROUND_BRACKET expression RIGHT_ROUND_BRACKET		{ $<exp>$ = $<exp>2; }
     | expression QUESTION_MARK expression COLON expression	{
-									// TODO
+									auto e = new Conditional_Expr(); 
+                                    e->expression1 = $<exp>1;   e->expression2 = $<exp>3;   e->expression3 = $<exp>5;
+                                    $<exp>$ = e;
 								}
     | expression AND expression  	 { auto e = new Boolean_Expr(); 
 					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("AND");
@@ -205,9 +246,9 @@ rel_expression
 					 }
 
 constant_as_operand 
-    : INT_NUM 
-    | FLOAT_NUM 
-    | STR_CONST
+    : INT_NUM       {  auto i = new Number_Expr_Int();  i->value = string(yylval.str);  $<exp>$ = i;   }
+    | FLOAT_NUM     {  auto i = new Number_Expr_Float();  i->value = string(yylval.str);  $<exp>$ = i;   }
+    | STR_CONST     {  auto i = new String_Expr();  i->value = string(yylval.str);  $<exp>$ = i;   }
 ;
 
 %%

@@ -1,5 +1,5 @@
 %{
-	#include<stdio.h>
+	#include <stdio.h>
 	#include "y.tab.h"
 	int lineno = 1;
 	extern int show_tokens;
@@ -46,11 +46,11 @@ read	{ FUN("READ", READ) }
 "=="		{ FUN("EQUAL", EQ) } 
 
 
-{digit}+				{ FUN("INT_NUM", INT_NUM) } 
-{digit}+\.{digit}*|{digit}*\.{digit}+	{ FUN("FLOAT_NUM", FLOAT_NUM) } 
-{letter}({letter}|{digit})*		{ FUN("NAME", NAME) } 
+{digit}+				{   yylval.str = (yytext);  FUN("INT_NUM", INT_NUM) } 
+{digit}+\.{digit}*|{digit}*\.{digit}+	{  yylval.str = (yytext);   FUN("FLOAT_NUM", FLOAT_NUM) } 
+{letter}({letter}|{digit})*		{  yylval.str = (yytext);  FUN("NAME", NAME) } 
 
-\"[^"\n\r]*\"	{ FUN("STR_CONST", STR_CONST) } 
+\"[^"\n\r]*\"	{ yylval.str = (yytext); FUN("STR_CONST", STR_CONST) } 
 
 \/\/.*	{}
 \n	{ lineno++; }

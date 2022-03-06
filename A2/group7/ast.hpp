@@ -8,9 +8,10 @@ using namespace std;
 #define TYPE_FLOAT  1
 #define TYPE_BOOL   2
 #define TYPE_STRING 3
+#define TYPE_VOID 4
+#define TYPE_FUNCTION 5
 
 // why are Expression and Statement inheriting from AST ? 
-
 
 class AST {
 public:
@@ -19,7 +20,7 @@ public:
 
 class Expression : public AST {
 public:
-	int type;
+	int type = -1;
 	virtual string print(int num_spaces) = 0;
 	string print_type(){
 		string rv;
@@ -28,7 +29,7 @@ public:
 			case(TYPE_FLOAT)  : { rv = "<float>" ; break; }
 			case(TYPE_BOOL)   : { rv = "<bool>"  ; break; }
 			case(TYPE_STRING) : { rv = "<string>"; break; }
-			default           : { return "err";  } // should be UNREACHABLE
+			default           : { return "<err>";  } // should be UNREACHABLE
 		}
 		return rv;
 	}
@@ -92,9 +93,9 @@ public:
 	virtual string print(int num_spaces){
 		string ws1 = string(num_spaces, ' ');
         	string ws2 = string(num_spaces+2, ' ');
-        	string total = ws1 + "Arith: Div" + print_type() + "\n" \
+        	string total = "\n" +  ws1 + "Arith: Div" + print_type() + "\n" \
 		             + ws2 + "L_Opd (" + left->print(num_spaces+4) + ")\n" \
-                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")\n" ;
+                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")" ;
 		return total;
 	}	
 };
@@ -104,9 +105,9 @@ public:
 	virtual string print(int num_spaces){
 		string ws1 = string(num_spaces, ' ');
         	string ws2 = string(num_spaces+2, ' ');
-        	string total = ws1 + "Arith: Mult" + print_type() + "\n" \
+        	string total = "\n" +  ws1 + "Arith: Mult" + print_type() + "\n" \
 		             + ws2 + "L_Opd (" + left->print(num_spaces+4) + ")\n" \
-                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")\n" ;
+                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")" ;
 		return total;
 	}	
 	
@@ -117,9 +118,9 @@ public:
 	virtual string print(int num_spaces){
 		string ws1 = string(num_spaces, ' ');
         	string ws2 = string(num_spaces+2, ' ');
-        	string total = ws1 + "Arith: Minus" + print_type() + "\n" \
+        	string total = "\n" +  ws1 + "Arith: Minus" + print_type() + "\n" \
 		             + ws2 + "L_Opd (" + left->print(num_spaces+4) + ")\n" \
-                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")\n" ;
+                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")" ;
 		return total;
 	}	
 };
@@ -129,9 +130,9 @@ public:
 	virtual string print(int num_spaces){
 		string ws1 = string(num_spaces, ' ');
         	string ws2 = string(num_spaces+2, ' ');
-        	string total = ws1 + "Arith: Plus" + print_type() + "\n" \
+        	string total = "\n" +  ws1 + "Arith: Plus" + print_type() + "\n" \
 		             + ws2 + "L_Opd (" + left->print(num_spaces+4) + ")\n" \
-                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")\n" ;
+                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")" ;
 		return total;
 	}	
 };
@@ -142,9 +143,9 @@ public:
 	virtual string print(int num_spaces){
 		string ws1 = string(num_spaces, ' ');
         	string ws2 = string(num_spaces+2, ' ');
-        	string total = ws1 + "Condition: " + op + print_type() + "\n" \
+        	string total = "\n" +  ws1 + "Condition: " + op + print_type() + "\n" \
 		             + ws2 + "L_Opd (" + left->print(num_spaces+4) + ")\n" \
-                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")\n" ;
+                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")" ;
 		return total;
 	}	
 };
@@ -155,9 +156,9 @@ public:
 	virtual string print(int num_spaces){
 		string ws1 = string(num_spaces, ' ');
         	string ws2 = string(num_spaces+2, ' ');
-        	string total = ws1 + "Condition: " + op + print_type() + "\n" \
+        	string total = "\n" + ws1 + "Condition: " + op + print_type() + "\n" \
 		             + ws2 + "L_Opd (" + left->print(num_spaces+4) + ")\n" \
-                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")\n" ;
+                             + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")" ;
 		return total;
 	}	
 };
@@ -176,7 +177,7 @@ public:
         string ws2 = string(num_spaces+2, ' ');
         string ret;
         ret = print_type();
-        string total = "Arith: Uminus"+ret+"\n" \
+        string total = "\n" + ws1 + "Arith: Uminus"+ret+"\n" \
                      + ws2 + "L_Opd (" \
                      + expression->print(num_spaces+4) + ")";
         return total;
@@ -193,7 +194,7 @@ public:
         string ws2 = string(num_spaces+2, ' ');
         string ret;
         ret = print_type();
-        string total = "Condition: NOT"+ret+"\n" \
+        string total = "\n" + ws1 + "Condition: NOT"+ret+"\n" \
                      + ws2 + "L_Opd (" \
                      + expression->print(num_spaces+4) + ")";
         return total;
@@ -215,9 +216,10 @@ public:
 
     virtual string print(int num_spaces){
         string ws1 = string(num_spaces, ' ');
-        string total = expression1->print(num_spaces+4) \
-                 + "True_Part ("+expression2->print(num_spaces+4)+")" \
-                 + "False_Part ("+expression3->print(num_spaces+4)+")";
+		string ws2 = string(num_spaces+4, ' ');
+        string total = expression1->print(num_spaces+4) + "\n" \
+                 + ws2 + "True_Part ("+expression2->print(num_spaces+6)+")\n" \
+                 + ws2 + "False_Part ("+expression3->print(num_spaces+6)+")";
         return total;
     }
 };
@@ -253,7 +255,7 @@ public:
     virtual string print(int num_spaces){
         string ws1 = string(num_spaces, ' ');
         string total = ws1 + "Read: " \
-                     + var_name->print(num_spaces+4);
+                     + var_name->print(num_spaces+4)+ "\n";
         return total;
     }
 
@@ -267,8 +269,8 @@ public:
 
     virtual string print(int num_spaces){
         string ws1 = string(num_spaces, ' ');
-        string total = ws1 + "Read: " \
-                     + expression->print(num_spaces+4);
+        string total = ws1 + "Write: " \
+                     + expression->print(num_spaces+4) + "\n";
         return total;
     }
 };
