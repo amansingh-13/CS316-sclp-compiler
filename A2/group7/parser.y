@@ -49,6 +49,7 @@ program
         P->functions = vector<Function*>();
         P->functions.push_back((Function *)$<pointer>2);
         P->infer_type();
+        P->weird_check_for_A2();
         cout<<P->print();
         $<pointer>$ = P;
      }
@@ -58,6 +59,7 @@ program
         P->functions = vector<Function*>();
         P->functions.push_back((Function *)$<pointer>1);
         P->infer_type();
+        P->weird_check_for_A2();
         cout<<P->print();
         $<pointer>$ = P;
      }

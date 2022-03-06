@@ -417,11 +417,11 @@ class Stmtlist : public AST {
 public:
 	vector<Statement*> statements;
 	virtual string print(int num_spaces=9){
-		string rv = "**BEGIN: Abstract Syntax Tree\n";
+		string rv = "**BEGIN: Abstract Syntax Tree \n";
 		for(Statement* it : statements){
 			rv += it->print(num_spaces);
 		}
-		rv += "**END: Abstract Syntax Tree\n";
+		rv += "**END: Abstract Syntax Tree \n";
 		return rv;
 	}
 

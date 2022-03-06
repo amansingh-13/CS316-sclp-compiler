@@ -30,6 +30,10 @@ public:
         for(auto vars : *global_symtab){
             Local_Symtab->insert(pair<string, int>(vars.first, vars.second));
         }
+        auto it = Local_Symtab->find("main");
+        if( it != Local_Symtab->end()){
+            yyerror("main cannot be a variable\n");
+        }
         stmtlist->infer_type(Local_Symtab);
         return return_type;
     }
@@ -63,5 +67,46 @@ public:
             s += i->print();
         }
         return s;
+    }
+
+    int weird_check_for_A2(){
+        switch(functions.size()){
+            case(1) : { 
+                if(functions[0]->Name != "main" || functions[0]->return_type != TYPE_VOID){
+                    yyerror("something is wrong with the main function\n");
+                    return -1;
+                }
+                break;
+            }
+            case(2) : { 
+                if ( 
+                    functions[0]->Name != "main" || 
+                    functions[0]->return_type != TYPE_VOID || 
+                    functions[0]->decl_or_def != IS_DECLARATION ||
+                    functions[1]->Name != "main" || 
+                    functions[1]->return_type != TYPE_VOID || 
+                    functions[1]->decl_or_def != IS_DEFINITION ||
+                    functions[0]->Param_List->size() != functions[1]->Param_List->size()
+                ){
+                    yyerror("something is wrong\n");
+                    return -1;
+                }
+
+                //check param list
+                for(int i=0; i<functions[0]->Param_List->size(); i++){
+                    if(
+                        (*(functions[0]->Param_List))[i].second != (*(functions[1]->Param_List))[i].second
+                    ){
+                        yyerror("something is wrong with parameter list\n");
+                        return -1;
+                    }
+                }
+                break;
+            }
+            default : {
+                yyerror("something is wrong with # of functions\n");
+                return -1;
+            }
+        }
     }
 };
