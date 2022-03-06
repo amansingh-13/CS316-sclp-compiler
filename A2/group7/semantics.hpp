@@ -57,14 +57,18 @@ public:
     vector<Function*> functions;
     void infer_type(){
         for(auto i: functions){
-            i->infer_type(Global_Symtab);
+            if(i->decl_or_def == IS_DEFINITION){
+                i->infer_type(Global_Symtab);
+            }
         }
     }
 
     string print(){
         string s = "";
         for(auto i: functions){
-            s += i->print();
+            if(i->decl_or_def == IS_DEFINITION){
+                s += i->print();
+            }
         }
         return s;
     }

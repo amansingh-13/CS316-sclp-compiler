@@ -1,5 +1,5 @@
-int main; 
-void main(){
+
+int main(){
     int w;
     w = 5;
 }

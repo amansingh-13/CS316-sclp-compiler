@@ -6,6 +6,8 @@
 #include <string>
 using namespace std;
 
+#define pairr pair<vector<Function*> *, SymTab*>
+
 extern FILE *yyin, *yyout;
 char *tok_file;
 int show_tokens;
@@ -44,9 +46,12 @@ int yylex();
 
 program 
     : global_decl_statement_list func_def   { 
+        pairr* K = (pairr *) $<pointer>1;
         auto P = new Program();
-        P->Global_Symtab = (SymTab *)$<pointer>1;
-        P->functions = vector<Function*>();
+        P->Global_Symtab = K->second;
+        P->functions = (*(K->first));
+        delete K->first;
+        delete K;
         P->functions.push_back((Function *)$<pointer>2);
         P->infer_type();
         P->weird_check_for_A2();
@@ -68,11 +73,14 @@ program
 global_decl_statement_list 
     : global_decl_statement_list func_decl 
         {  
-            // TODO
+            pairr* K = (pairr *)$<pointer>1;
+            K->first->push_back((Function *)$<pointer>2);
+            $<pointer>$ = K;
         }
     | global_decl_statement_list var_decl_stmt 
         {
-            SymTab* X = (SymTab *)$<pointer>1;
+            pairr* K = (pairr *)$<pointer>1;
+            SymTab* X = K->second;
             SymTab* Y = (SymTab *)$<pointer>2;
 
             for(auto vars : *Y){
@@ -83,10 +91,21 @@ global_decl_statement_list
                 }
             }
             delete Y;
-            $<pointer>$ = X;
+            $<pointer>$ = K;
         }
-    | var_decl_stmt         {   $<pointer>$ = $<pointer>1;   }
-    | func_decl             { }  //TODO
+    | var_decl_stmt         { 
+        auto S = new pair<vector<Function*> *, SymTab*>();
+        S->second = (SymTab *)$<pointer>1;   
+        S->first = new vector<Function*>();
+        $<pointer>$ = S;  
+     }
+    | func_decl             {   
+        auto S = new pair<vector<Function*> *, SymTab*>();
+        S->second = new SymTab();
+        S->first = new vector<Function*>();
+        S->first->push_back((Function *)$<pointer>1);
+        $<pointer>$ = S;
+     }  //TODO
 ;
 
 func_decl 
