@@ -1,27 +1,32 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 using namespace std;
+extern int yyerror(char *);
 
-
-#define TYPE_INT    0
 #define TYPE_FLOAT  1
 #define TYPE_BOOL   2
 #define TYPE_STRING 3
-#define TYPE_VOID 4
+#define TYPE_VOID   4
 #define TYPE_FUNCTION 5
+#define TYPE_INT    6
 
-// why are Expression and Statement inheriting from AST ? 
+
+typedef map<string, int> SymTab; 
+
 
 class AST {
 public:
-	virtual string print(int num_spaces) = 0;    
+	virtual string print(int num_spaces) = 0;
+	virtual int infer_type(SymTab* symtab) = 0;
 };
 
 class Expression : public AST {
 public:
 	int type = -1;
 	virtual string print(int num_spaces) = 0;
+	virtual int infer_type(SymTab* symtab) = 0;
 	string print_type(){
 		string rv;
 		switch(type){
@@ -40,6 +45,7 @@ class Base_Expr : public Expression {
 public:
 	string value;
 	virtual string print(int num_spaces) = 0;
+	virtual int infer_type(SymTab* symtab) = 0;
 };
 
 class Name_Expr : public Base_Expr {
@@ -48,6 +54,15 @@ public:
 	{
 		string rv = "Name : " + value + "_" + print_type();
 		return rv;
+	}
+
+	virtual int infer_type(SymTab* symtab){
+		auto it = symtab->find(value);
+		if(it == symtab->end()){
+			yyerror("variable not declared\n");
+		}
+		this->type = it->second;
+		return it->second;
 	}
 };
 
@@ -58,6 +73,11 @@ public:
 		int parsed_val = stoi(value); // TODO
 		return "Num : " + to_string(parsed_val) + "<int>";
 	}
+
+	virtual int infer_type(SymTab* symtab){
+		this->type = TYPE_INT;
+		return TYPE_INT;
+	}
 };
 
 class Number_Expr_Float : public Base_Expr {
@@ -67,6 +87,11 @@ public:
 		float parsed_val = stof(value); // TODO
 		return "Num : " + to_string(parsed_val) + "<float>";
 	}
+
+	virtual int infer_type(SymTab* symtab){
+		this->type = TYPE_FLOAT;
+		return TYPE_FLOAT;
+	}
 };
 
 class String_Expr : public Base_Expr {
@@ -75,16 +100,30 @@ public:
 	{
 		return "String : " + value + "<string>";
 	}
+
+	virtual int infer_type(SymTab* symtab){
+		this->type = TYPE_STRING;
+		return TYPE_STRING;
+	}
 };
 
 class Binary_Expr : public Expression {
 public:
 	Expression *left, *right;
 	virtual string print(int num_spaces) = 0;
-	virtual void infer_type(){
+	virtual int infer_type(SymTab* symtab){
+		left->infer_type(symtab);
+		right->infer_type(symtab);
 		if(left->type == right->type){
-			
+			if(left->type != TYPE_INT && left->type != TYPE_FLOAT ){
+				yyerror("Not supported operand type for binary expression\n");
+				return -1;
+			}
+			this->type = left->type;
+			return this->type;
 		}
+		yyerror("Type Mismatch\n");
+		return -1;
 	}
 };
 
@@ -147,6 +186,21 @@ public:
 		             + ws2 + "L_Opd (" + left->print(num_spaces+4) + ")\n" \
                              + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")" ;
 		return total;
+	}
+
+	virtual int infer_type(SymTab* symtab){
+		left->infer_type(symtab);
+		right->infer_type(symtab);
+		if(left->type == right->type){
+			if(left->type != TYPE_BOOL){
+				yyerror("Not supported operand type for binary expression\n");
+				return -1;
+			}
+			this->type = left->type;
+			return this->type;
+		}
+		yyerror("Type Mismatch\n");
+		return -1;
 	}	
 };
 
@@ -161,11 +215,27 @@ public:
                              + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")" ;
 		return total;
 	}	
+
+	virtual int infer_type(SymTab* symtab){
+		left->infer_type(symtab);
+		right->infer_type(symtab);
+		if(left->type == right->type){
+			if(left->type != TYPE_INT && left->type != TYPE_FLOAT ){
+				yyerror("Not supported operand type for binary expression\n");
+				return -1;
+			}
+			this->type = TYPE_BOOL;
+			return TYPE_BOOL;
+		}
+		yyerror("Type Mismatch\n");
+		return -1;
+	}
 };
 
 class Unary_Expr : public Expression {
 public:
 	virtual string print(int num_spaces) = 0;
+	virtual int infer_type(SymTab* symtab) = 0;
 };
 
 class UMinus_Expr : public Unary_Expr {
@@ -183,6 +253,16 @@ public:
         return total;
     }
 
+	virtual int infer_type(SymTab* symtab){
+		expression->infer_type(symtab);
+		if(expression->type != TYPE_INT && expression->type != TYPE_FLOAT ){
+			yyerror("Not supported operand type for uminus expression\n");
+			return -1;
+		}
+		this->type = expression->type;
+		return this->type;
+	}
+
 };
 
 class Not_Expr : public Unary_Expr {
@@ -199,6 +279,16 @@ public:
                      + expression->print(num_spaces+4) + ")";
         return total;
     }
+
+	virtual int infer_type(SymTab* symtab){
+		expression->infer_type(symtab);
+		if(expression->type != TYPE_BOOL){
+			yyerror("Not supported operand type for uminus expression\n");
+			return -1;
+		}
+		this->type = TYPE_BOOL;
+		return TYPE_BOOL;
+	}
 
 };
 
@@ -222,12 +312,32 @@ public:
                  + ws2 + "False_Part ("+expression3->print(num_spaces+6)+")";
         return total;
     }
+
+	virtual int infer_type(SymTab* symtab){
+		expression1->infer_type(symtab);
+		expression2->infer_type(symtab);
+		expression3->infer_type(symtab);
+
+		if(expression1->type != TYPE_BOOL){
+			yyerror("First expression in ?: must be boolean\n");
+			return -1;
+		}
+
+		if(expression2->type != expression3->type){
+			yyerror("Expressions on both sides of COLON must be of same type\n");
+			return -1;
+		}
+
+		this->type = expression2->type;
+		return this->type;
+	}
 };
 
 
 class Statement : public AST {
 public:
 	virtual string print(int num_spaces) = 0;    
+	virtual int infer_type(SymTab* symtab) = 0;
 };
 
 
@@ -246,6 +356,14 @@ public:
 
         return total;
     }
+
+	virtual int infer_type(SymTab* symtab){
+		if(LHS->infer_type(symtab) != RHS->infer_type(symtab)){
+			yyerror("Type mismatch\n");
+			return -1;
+		}
+		return 0;
+	}
 };
 
 class Read_Stmt : public Statement{
@@ -258,6 +376,14 @@ public:
                      + var_name->print(num_spaces+4)+ "\n";
         return total;
     }
+
+	virtual int infer_type(SymTab* symtab){
+		int t = var_name->infer_type(symtab);
+		if( t!=TYPE_INT && t!=TYPE_FLOAT ){
+			yyerror("Can't read \n");
+		}
+		return 0;
+	}
 
 };
 
@@ -273,6 +399,14 @@ public:
                      + expression->print(num_spaces+4) + "\n";
         return total;
     }
+
+	virtual int infer_type(SymTab* symtab){
+		int t = expression->infer_type(symtab);
+		if( t!=TYPE_INT && t!=TYPE_FLOAT && t!=TYPE_STRING ){
+			yyerror("Can't Print \n");
+		}
+		return 0;
+	}
 };
 
 class Stmtlist : public AST {
@@ -285,5 +419,12 @@ public:
 		}
 		rv += "**END: Abstract Syntax Tree\n";
 		return rv;
+	}
+
+	virtual int infer_type(SymTab* symtab){
+		for(auto i: statements){
+            i->infer_type(symtab);
+        }
+		return 0;
 	}
 };

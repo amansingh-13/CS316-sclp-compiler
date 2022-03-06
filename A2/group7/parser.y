@@ -48,6 +48,8 @@ program
         P->Global_Symtab = (SymTab *)$<pointer>1;
         P->functions = vector<Function*>();
         P->functions.push_back((Function *)$<pointer>2);
+        P->infer_type();
+        cout<<P->print();
         $<pointer>$ = P;
      }
     | func_def                              { 
@@ -55,6 +57,8 @@ program
         P->Global_Symtab = new SymTab();
         P->functions = vector<Function*>();
         P->functions.push_back((Function *)$<pointer>1);
+        P->infer_type();
+        cout<<P->print();
         $<pointer>$ = P;
      }
 ;
@@ -121,7 +125,6 @@ func_def
 
 		Function* func = (Function *)$<pointer>1;
 		func->stmtlist = $<stmtlist>7;
-        cout<<func->stmtlist->print();
 		func->Local_Symtab = locals;
 		func->Param_List   = params;
         func->decl_or_def = IS_DEFINITION;
@@ -134,9 +137,9 @@ func_def
 
 		Function* func = (Function *)$<pointer>1;
 		func->stmtlist = $<stmtlist>6;
-        cout<<func->stmtlist->print();
 		func->Local_Symtab = locals;
 		func->Param_List   = NULL;
+        func->decl_or_def = IS_DEFINITION;
 		
 		$<pointer>$ = func; 
 	}
@@ -200,11 +203,14 @@ var_decl_stmt
         auto X = new SymTab();
         vector<string>* K = (vector<string>*)$<pointer>2;
         int type = $<var_type>1;
+        if(type == TYPE_VOID){
+            yyerror("Variable type cannot be void\n");
+        }
         for(auto var_name : *K){
             auto ret = X->insert(pair<string, int>(var_name, type));
             if (ret.second == false){
                 //TODO
-                yyerror("Variable declared more than once in the same scope");
+                yyerror("Variable declared more than once in the same scope\n");
             }
         }
         delete K;
