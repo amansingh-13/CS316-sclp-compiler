@@ -21,7 +21,7 @@ class Function{
 public:
     string Name;
     SymTab* Local_Symtab;
-    SymTab* Param_List;
+    vector<pair<string, int>>* Param_List;
     Stmtlist* stmtlist;
     int return_type;
     bool decl_or_def;
@@ -35,13 +35,13 @@ public:
     }
 
     virtual string print(int num_spaces=9){
-		string rv = "**PROCEDURE: "+Name+"\n"; //TODO
-        rv += "\tReturn Type: "+print_type(return_type)+"\n";
-        rv += "\tFormal Parameters:"+"\n";
+		string rv = "**PROCEDURE: " + Name + "\n"; //TODO
+        rv += "\tReturn Type: " + print_type(return_type) + "\n";
+        rv += "\tFormal Parameters:\n";
 		for(auto it : *Param_List){
-			rv += it->print(num_spaces);
+			rv += "\t\t" + it.first + "_  Type:" + print_type(it.second) + "\n";
 		}
-		rv += "**END: Abstract Syntax Tree\n";
+		rv += stmtlist->print();
 		return rv;
 	}
 

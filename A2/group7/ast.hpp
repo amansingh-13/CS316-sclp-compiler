@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <sstream>
 using namespace std;
 extern int yyerror(char *);
 
@@ -85,7 +86,10 @@ public:
 	virtual string print(int num_spaces)
 	{
 		float parsed_val = stof(value); // TODO
-		return "Num : " + to_string(parsed_val) + "<float>";
+        ostringstream temp; 
+        temp.precision(2);
+        temp << fixed << parsed_val;
+		return "Num : " + temp.str() + "<float>";
 	}
 
 	virtual int infer_type(SymTab* symtab){

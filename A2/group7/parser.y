@@ -64,23 +64,27 @@ program
 ;
 
 global_decl_statement_list 
-    : global_decl_statement_list func_decl
-    | global_decl_statement_list var_decl_stmt {
-        SymTab* X = (SymTab *)$<pointer>1;
-        SymTab* Y = (SymTab *)$<pointer>2;
-
-        for(auto vars : *Y){
-            auto ret = X->insert(pair<string, int>(vars.first, vars.second));
-            if (ret.second == false){
-                //TODO
-                yyerror("Variable declared more than once in the same scope");
-            }
+    : global_decl_statement_list func_decl 
+        {  
+            // TODO
         }
-        delete Y;
-        $<pointer>$ = X;
-    }
-    | var_decl_stmt         {    $<pointer>$ = $<pointer>1;   }
-    | func_decl             
+    | global_decl_statement_list var_decl_stmt 
+        {
+            SymTab* X = (SymTab *)$<pointer>1;
+            SymTab* Y = (SymTab *)$<pointer>2;
+
+            for(auto vars : *Y){
+                auto ret = X->insert(pair<string, int>(vars.first, vars.second));
+                if (ret.second == false){
+                    //TODO
+                    yyerror("Variable declared more than once in the same scope");
+                }
+            }
+            delete Y;
+            $<pointer>$ = X;
+        }
+    | var_decl_stmt         {   $<pointer>$ = $<pointer>1;   }
+    | func_decl             { }  //TODO
 ;
 
 func_decl 
@@ -88,25 +92,30 @@ func_decl
 		
 		Function* func = (Function *)$<pointer>1;
         func->decl_or_def = IS_DECLARATION;	
-        SymTab* params = (SymTab *)$<pointer>3;
+        vector<pair<string, int>>* params = (vector<pair<string, int>>*)$<pointer>3;
         func->Param_List   = params;
-
 		$<pointer>$ = func; 
 	}
     | func_header LEFT_ROUND_BRACKET RIGHT_ROUND_BRACKET SEMICOLON      {
 		
 		Function* func = (Function *)$<pointer>1;
-        func->decl_or_def = IS_DECLARATION;		
+        func->decl_or_def = IS_DECLARATION;	
+        func->Param_List   = new vector<pair<string, int>>;
 		$<pointer>$ = func; 
 
 	}
 ;
 
 func_header
-    : named_type var_decl_item { auto func = new Function(); 
-				 func->return_type = $<var_type>1;
-				 func->Name = string($<str>2);
-				 $<pointer>$ = func; }
+    : named_type var_decl_item 
+            {
+                auto func = new Function(); 
+				func->return_type = $<var_type>1;
+                string* name = (string*)$<pointer>2;
+				func->Name = *name;
+                delete name;
+				$<pointer>$ = func;
+            }
 ;
 
 func_def 
@@ -114,12 +123,12 @@ func_def
 	{
 		
 		SymTab* locals = (SymTab *)$<pointer>6;
-		SymTab* params = (SymTab *)$<pointer>3;
+		vector<pair<string, int>>* params = (vector<pair<string, int>>*)$<pointer>3;
 		for(auto vars : *params){
-		    auto ret = locals->insert(pair<string, int>(vars.first, vars.second));
+		    auto ret = locals->insert({vars.first, vars.second});
 		    if (ret.second == false){
-			//TODO
-			yyerror("Variable declared more than once in the same scope");
+                //TODO
+                yyerror("Variable declared more than once in the same scope");
 		    }
 		}
 
@@ -131,14 +140,15 @@ func_def
 		
 		$<pointer>$ = func; 
 	}
-    | func_header LEFT_ROUND_BRACKET  RIGHT_ROUND_BRACKET  LEFT_CURLY_BRACKET optional_local_var_decl_stmt_list statement_list   RIGHT_CURLY_BRACKET  {
+    | func_header LEFT_ROUND_BRACKET  RIGHT_ROUND_BRACKET  LEFT_CURLY_BRACKET optional_local_var_decl_stmt_list statement_list   RIGHT_CURLY_BRACKET  
+    {
 		
 		SymTab* locals = (SymTab *)$<pointer>5;
 
 		Function* func = (Function *)$<pointer>1;
 		func->stmtlist = $<stmtlist>6;
 		func->Local_Symtab = locals;
-		func->Param_List   = NULL;
+		func->Param_List   = new vector<pair<string, int>>;
         func->decl_or_def = IS_DEFINITION;
 		
 		$<pointer>$ = func; 
@@ -148,24 +158,32 @@ func_def
 formal_param_list
     : formal_param_list COMMA formal_param 
 		{ 
-			SymTab* X = (SymTab *)$<pointer>1;
-			SymTab* Y = (SymTab *)$<pointer>3;
-
-			for(auto vars : *Y){
-			    auto ret = X->insert(pair<string, int>(vars.first, vars.second));
-			    if (ret.second == false){
-				//TODO
-				yyerror("Variable declared more than once in the same scope");
-			    }
-			}
+			vector<pair<string, int>>* X = (vector<pair<string, int>>*)$<pointer>1;
+			pair<string, int>* Y = (pair<string, int> *)$<pointer>3;
+			X->push_back({Y->first, Y->second});
 			delete Y; 
-        		$<pointer>$ = X;
+        	$<pointer>$ = X;
 		}
-    | formal_param		{ $<pointer>$ = $<pointer>1; } 
+    | formal_param		
+        {
+            auto ret = new vector<pair<string, int>>;
+            pair<string, int>* elem = (pair<string, int>*) $<pointer>1;
+            ret->push_back({elem->first, elem->second});
+            delete elem;
+            $<pointer>$ = ret;
+        }
 ;
 
 formal_param 
-    : param_type var_decl_item 	{ auto ret = new SymTab(); (*ret)[string($<str>2)] = $<var_type>1; $<pointer>$ = ret; }
+    : param_type var_decl_item 	
+        { 
+            auto ret = new pair<string, int>;
+            string* add = (string*)$<pointer>2;
+            ret->first = *add;
+            delete add;
+            ret->second = $<var_type>1;
+            $<pointer>$ = ret; 
+        }
 ;
 
 param_type 
@@ -219,20 +237,25 @@ var_decl_stmt
 ;
 
 var_decl_item_list
-    : var_decl_item_list COMMA var_decl_item   {   
+    : var_decl_item_list COMMA var_decl_item   
+                                {   
                                     vector<string>* K = (vector<string>*)$<pointer>1;
-                                    K->push_back(string($<str>3));
+                                    string* add = (string*)$<pointer>3;
+                                    K->push_back(*add);
+                                    delete add;
                                     $<pointer>$ = K;
                                 }
     | var_decl_item             {   
                                     auto K = new vector<string>;
-                                    K->push_back(string($<str>1));
+                                    string* add = (string*)$<pointer>1;
+                                    K->push_back(*add);
+                                    delete add;
                                     $<pointer>$ = K;
                                 }
 ;
 
 var_decl_item 
-    : NAME                      {  $<str>$ = yylval.str ;  }
+    : NAME                      {  $<pointer>$ = new string(yylval.str); }
 ;
 
 named_type 
@@ -274,14 +297,16 @@ variable_name
 ;
 
 print_statement
-    : WRITE expression SEMICOLON	{   auto Ws = new Write_Stmt();
+    : WRITE expression SEMICOLON	
+                    {   auto Ws = new Write_Stmt();
 					    Ws->expression = $<exp>2;
 					    $<stmt>$ = Ws;
 					}
 ;
 
 read_statement
-    : READ variable_name SEMICOLON	{   auto Rs = new Read_Stmt();
+    : READ variable_name SEMICOLON	
+                    {   auto Rs = new Read_Stmt();
 					    Rs->var_name = $<exp>2;
 					    $<stmt>$ = Rs;
 					}
@@ -289,12 +314,15 @@ read_statement
 
 expression
     : expression PLUS expression	 { auto e = new Plus_Expr()  ; e->left = $<exp>1; e->right = $<exp>3; $<exp>$ = e; }
-    | expression MINUS expression	 { auto e = new Minus_Expr() ; e->left = $<exp>1; e->right = $<exp>3; $<exp>$ = e; }
-    | expression MULT expression	 { auto e = new Mult_Expr()  ; e->left = $<exp>1; e->right = $<exp>3; $<exp>$ = e; }
-    | expression DIV expression 	 { auto e = new Div_Expr()   ; e->left = $<exp>1; e->right = $<exp>3; $<exp>$ = e; }
-    | MINUS expression      %prec UMINUS { auto e = new UMinus_Expr(); e->expression = $<exp>2; $<exp>$ = e; }
-    | LEFT_ROUND_BRACKET expression RIGHT_ROUND_BRACKET		{ $<exp>$ = $<exp>2; }
-    | expression QUESTION_MARK expression COLON expression	{
+    | expression MINUS expression    { auto e = new Minus_Expr() ; e->left = $<exp>1; e->right = $<exp>3; $<exp>$ = e; }
+    | expression MULT expression     { auto e = new Mult_Expr()  ; e->left = $<exp>1; e->right = $<exp>3; $<exp>$ = e; }
+    | expression DIV expression      { auto e = new Div_Expr()   ; e->left = $<exp>1; e->right = $<exp>3; $<exp>$ = e; }
+    | MINUS expression      %prec UMINUS 
+                                     { auto e = new UMinus_Expr(); e->expression = $<exp>2; $<exp>$ = e; }
+    | LEFT_ROUND_BRACKET expression RIGHT_ROUND_BRACKET		
+                                     { $<exp>$ = $<exp>2; }
+    | expression QUESTION_MARK expression COLON expression	
+                                {
 									auto e = new Conditional_Expr(); 
                                     e->expression1 = $<exp>1;   e->expression2 = $<exp>3;   e->expression3 = $<exp>5;
                                     $<exp>$ = e;
@@ -316,30 +344,36 @@ expression
 ;
 
 rel_expression
-    : expression LT expression		 { auto e = new Relational_Expr(); 
+    : expression LT expression		 
+                    {  auto e = new Relational_Expr(); 
+					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("LT");
+					   $<exp>$ = e; 
+					}
+    | expression LE expression		 
+                    {  auto e = new Relational_Expr(); 
 					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("LE");
 					   $<exp>$ = e; 
-					 }
-    | expression LE expression		 { auto e = new Relational_Expr(); 
-					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("LE");
-					   $<exp>$ = e; 
-					 }	
-    | expression GT expression		 { auto e = new Relational_Expr(); 
+					}	
+    | expression GT expression		 
+                    {  auto e = new Relational_Expr(); 
 					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("GT");
 					   $<exp>$ = e; 
-					 }
-    | expression GE expression		 { auto e = new Relational_Expr(); 
+					}
+    | expression GE expression		 
+                    {  auto e = new Relational_Expr(); 
 					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("GE");
 					   $<exp>$ = e; 
-					 }
-    | expression NE expression		 { auto e = new Relational_Expr(); 
+					}
+    | expression NE expression		 
+                    {  auto e = new Relational_Expr(); 
 					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("NE");
 					   $<exp>$ = e; 
-					 }
-    | expression EQ expression		 { auto e = new Relational_Expr(); 
+					}
+    | expression EQ expression		 
+                    {  auto e = new Relational_Expr(); 
 					   e->left = $<exp>1; e->right = $<exp>3; e->op = string("EQ");
 					   $<exp>$ = e; 
-					 }
+					}
 
 constant_as_operand 
     : INT_NUM       {  auto i = new Number_Expr_Int();  i->value = string(yylval.str);  $<exp>$ = i;   }
