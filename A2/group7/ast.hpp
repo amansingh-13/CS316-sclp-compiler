@@ -168,6 +168,7 @@ public:
 };
 
 class UMinus_Expr : public Unary_Expr {
+public:
 	Expression* expression;
 
     virtual string print(int num_spaces){
@@ -176,6 +177,23 @@ class UMinus_Expr : public Unary_Expr {
         string ret;
         ret = print_type();
         string total = "Arith: Uminus"+ret+"\n" \
+                     + ws2 + "L_Opd (" \
+                     + expression->print(num_spaces+4) + ")";
+        return total;
+    }
+
+};
+
+class Not_Expr : public Unary_Expr {
+public:
+	Expression* expression;
+
+    virtual string print(int num_spaces){
+        string ws1 = string(num_spaces, ' ');
+        string ws2 = string(num_spaces+2, ' ');
+        string ret;
+        ret = print_type();
+        string total = "Condition: NOT"+ret+"\n" \
                      + ws2 + "L_Opd (" \
                      + expression->print(num_spaces+4) + ")";
         return total;
