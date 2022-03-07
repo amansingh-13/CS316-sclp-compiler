@@ -85,7 +85,7 @@ class Number_Expr_Float : public Base_Expr {
 public:
 	virtual string print(int num_spaces)
 	{
-		float parsed_val = atof(value.c_str()); // TODO
+		double parsed_val = strtod(value.c_str(), NULL); // TODO
         ostringstream temp; 
         temp.precision(2);
         temp << fixed << parsed_val;
