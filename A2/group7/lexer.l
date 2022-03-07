@@ -2,7 +2,7 @@
 	#include <stdio.h>
 	#include "y.tab.h"
 	int lineno = 1;
-	extern int show_tokens;
+	extern bool show_tokens;
 	extern int yyerror(char *);
 	extern char *tok_file;
 	#define FUN(a, b) { if(show_tokens) {fprintf(yyout, "\tToken Name: %s \tLexeme: %s \t Lineno: %d\n", a, yytext, lineno);} return b; }
