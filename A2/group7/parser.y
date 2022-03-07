@@ -9,11 +9,11 @@ using namespace std;
 #define pairr pair<vector<Function*> *, SymTab*>
 
 extern FILE *yyin, *yyout;
-char *tok_file;
-int show_tokens;
+char *tok_file, *ast_file;
+bool show_tokens, show_ast, sa_parse;
 int yyerror(char*);
 int yylex();
-
+FILE* ast_file_desc;
 %}
 %union{
     class AST* node;
@@ -53,9 +53,15 @@ program
         delete K->first;
         delete K;
         P->functions.push_back((Function *)$<pointer>2);
-        P->infer_type();
-        P->weird_check_for_A2();
-        cout<<P->print();
+        if(!sa_parse){
+            P->infer_type();
+            P->weird_check_for_A2();
+            if(show_ast){
+                string k = P->print();
+                fprintf(ast_file_desc, k.c_str());
+            }
+        }
+        
         $<pointer>$ = P;
      }
     | func_def                              { 
@@ -63,9 +69,14 @@ program
         P->Global_Symtab = new SymTab();
         P->functions = vector<Function*>();
         P->functions.push_back((Function *)$<pointer>1);
-        P->infer_type();
-        P->weird_check_for_A2();
-        cout<<P->print();
+        if(!sa_parse){
+            P->infer_type();
+            P->weird_check_for_A2();
+            if(show_ast){
+                string k = P->print();
+                fprintf(ast_file_desc, k.c_str());
+            }
+        }
         $<pointer>$ = P;
      }
 ;
@@ -406,14 +417,32 @@ constant_as_operand
 
 int main(int argc, char* argv[]){
     show_tokens = 0;
+    sa_parse = 0;
+    show_ast = 0;
+    bool file_found = false;
     char* filename = NULL;
 
     for(int i=1; i<argc; i++){
         if(strcmp("--show-tokens", argv[i]) == 0){
             show_tokens = 1;
         }
-        else {
+        else if(strcmp("--sa-parse", argv[i]) == 0){
+            sa_parse = 1;
+        }
+        else if(strcmp("--show-ast", argv[i]) == 0){
+            show_ast = 1;
+        }
+        else{
+            if(!file_found){
+                filename = argv[i]; 
             filename = argv[i];        
+                filename = argv[i]; 
+                file_found = true;    
+            }
+            else{
+                fprintf(stderr, "only one filename allowed\n");
+                exit(1);
+            }
         }
     }
 
@@ -434,6 +463,13 @@ int main(int argc, char* argv[]){
         yyout = fopen(tok_file, "w");
     }
 
+    if(show_ast && (!sa_parse)){
+        ast_file = (char*)malloc(strlen(filename)+4+1);
+        strncpy(ast_file, filename, strlen(filename));
+        strcat(ast_file, ".ast");
+        ast_file_desc = fopen(ast_file, "w+");
+    }
+
     yyparse();
 
     return 0;
@@ -443,8 +479,12 @@ int yyerror(char *mesg){
     fprintf(stderr, "%s\n", mesg);
     if(show_tokens){ 
         fclose(yyout); 
-        fopen(tok_file, "w+");
-	}    
+        fopen(tok_file, "w");
+	}
+    if(show_ast && (!sa_parse)){
+        fclose(ast_file_desc);
+        fopen(ast_file, "w");
+    }
     exit(1);
 }
 

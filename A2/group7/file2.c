@@ -1,17 +1,11 @@
-int z;
+#include <stdio.h>
 
-void main(int u, int b, int x){
-    bool y;
-    y = y ? y : y;
-}
-
-void x(){
-    int u;
-    u = 5;
-}
-
-
-void h(){
-    int u;
-    u = 5;
+void main(){
+    int a;
+    float b;
+    double c;
+    a = 2189999999999999999;
+    b = 10000000000000000000000000000000.0;
+    c = 10000000000000000000000000000000.0;
+    printf("%d\n%f\n%f\n", a, b, c);
 }

@@ -3,6 +3,7 @@
 	#include "y.tab.h"
 	int lineno = 1;
 	extern int show_tokens;
+	extern int yyerror(char *);
 	extern char *tok_file;
 	#define FUN(a, b) { if(show_tokens) {fprintf(yyout, "\tToken Name: %s \tLexeme: %s \t Lineno: %d\n", a, yytext, lineno);} return b; }
 %}
@@ -55,13 +56,8 @@ read	{ FUN("READ", READ) }
 \/\/.*	{}
 \n	{ lineno++; }
 [ \t\r\f]  {}
-.	{ 
-		fprintf(stderr, "Illegal Character: %s on line %d\n", yytext, lineno); 
-		if(show_tokens){ 
-			fclose(yyout); 
-			fopen(tok_file, "w+");
-		} 
-		exit(1); 
+.	{ 	
+		yyerror("Illegal Character somewhere\n");
 	}
 
 %%
