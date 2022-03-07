@@ -18,15 +18,15 @@ int labelIndex = 0;
 int specialTempIndex = 0;
 
 string getNewTemp(){
-	return "temp"+string(tempIndex++);
+	return "temp"+to_string(tempIndex++);
 }
 
 string getNewLabel(){
-	return "Label"+string(labelIndex++);
+	return "Label"+to_string(labelIndex++);
 }
 
 string getNewSpecialTemp(){
-	return "stemp"+string(specialTempIndex++);
+	return "stemp"+to_string(specialTempIndex++);
 }
 
 
@@ -87,7 +87,8 @@ public:
 	}
 
 	virtual void generate_tac(){
-
+		this->code = "";
+		this->place = this->value+"_";
 	}
 };
 
@@ -102,6 +103,11 @@ public:
 	virtual int infer_type(SymTab* symtab){
 		this->type = TYPE_INT;
 		return TYPE_INT;
+	}
+
+	virtual void generate_tac(){
+		this->code = "";
+		this->place = to_string(atoi(value.c_str()));
 	}
 };
 
@@ -120,6 +126,11 @@ public:
 		this->type = TYPE_FLOAT;
 		return TYPE_FLOAT;
 	}
+
+	virtual void generate_tac(){
+		this->code = "";
+		this->place = to_string(strtod(value.c_str(), NULL));
+	}
 };
 
 class String_Expr : public Base_Expr {
@@ -132,6 +143,11 @@ public:
 	virtual int infer_type(SymTab* symtab){
 		this->type = TYPE_STRING;
 		return TYPE_STRING;
+	}
+
+	virtual void generate_tac(){
+		this->code = "";
+		this->place = this->value;
 	}
 };
 
@@ -165,6 +181,15 @@ public:
                              + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")" ;
 		return total;
 	}	
+
+	virtual void generate_tac(){
+		this->left->generate_tac();
+		this->right->generate_tac();
+		string var = getNewTemp();
+		string c3 = var + " = " + this->left->place + "/" + this->right->place + "\n";
+		this->place = var;
+		this->code = this->left->code + this->right->code + c3;
+	}
 };
 
 class Mult_Expr : public Binary_Expr {
@@ -177,6 +202,15 @@ public:
                              + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")" ;
 		return total;
 	}	
+
+	virtual void generate_tac(){
+		this->left->generate_tac();
+		this->right->generate_tac();
+		string var = getNewTemp();
+		string c3 = var + " = " + this->left->place + "*" + this->right->place + "\n";
+		this->place = var;
+		this->code = this->left->code + this->right->code + c3;
+	}
 	
 };
 
@@ -189,6 +223,15 @@ public:
 		             + ws2 + "L_Opd (" + left->print(num_spaces+4) + ")\n" \
                              + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")" ;
 		return total;
+	}
+
+	virtual void generate_tac(){
+		this->left->generate_tac();
+		this->right->generate_tac();
+		string var = getNewTemp();
+		string c3 = var + " = " + this->left->place + " - " + this->right->place + "\n";
+		this->place = var;
+		this->code = this->left->code + this->right->code + c3;
 	}	
 };
 
@@ -202,6 +245,15 @@ public:
                              + ws2 + "R_Opd (" + right->print(num_spaces+4) + ")" ;
 		return total;
 	}	
+
+	virtual void generate_tac(){
+		this->left->generate_tac();
+		this->right->generate_tac();
+		string var = getNewTemp();
+		string c3 = var + " = " + this->left->place + "+" + this->right->place + "\n";
+		this->place = var;
+		this->code = this->left->code + this->right->code + c3;
+	}
 };
 
 class Boolean_Expr : public Binary_Expr {
@@ -230,6 +282,16 @@ public:
 		yyerror("Type Mismatch\n");
 		return -1;
 	}	
+
+	virtual void generate_tac(){
+		this->left->generate_tac();
+		this->right->generate_tac();
+		string var = getNewTemp();
+		string op_here = op; //TODO
+		string c3 = var + " = " + this->left->place + op_here + this->right->place + "\n";
+		this->place = var;
+		this->code = this->left->code + this->right->code + c3;
+	}
 };
 
 class Relational_Expr : public Binary_Expr {
@@ -257,6 +319,16 @@ public:
 		}
 		yyerror("Type Mismatch\n");
 		return -1;
+	}
+
+	virtual void generate_tac(){
+		this->left->generate_tac();
+		this->right->generate_tac();
+		string var = getNewTemp();
+		string op_here = op; //TODO
+		string c3 = var + " = " + this->left->place + " " + op_here + " " + this->right->place + "\n";
+		this->place = var;
+		this->code = this->left->code + this->right->code + c3;
 	}
 };
 
@@ -291,6 +363,14 @@ public:
 		return this->type;
 	}
 
+	virtual void generate_tac(){
+		this->expression->generate_tac();
+		string var = getNewTemp();
+		string c3 = var + " = " + " - " + this->expression->place + "\n";
+		this->place = var;
+		this->code = this->expression->code + c3;
+	}
+
 };
 
 class Not_Expr : public Unary_Expr {
@@ -316,6 +396,14 @@ public:
 		}
 		this->type = TYPE_BOOL;
 		return TYPE_BOOL;
+	}
+
+	virtual void generate_tac(){
+		this->expression->generate_tac();
+		string var = getNewTemp();
+		string c3 = var + " = " + "!" + this->expression->place + "\n";
+		this->place = var;
+		this->code = this->expression->code + c3;
 	}
 
 };
@@ -359,6 +447,26 @@ public:
 		this->type = expression2->type;
 		return this->type;
 	}
+
+	virtual void generate_tac(){
+		expression1->generate_tac();
+		expression2->generate_tac();
+		expression3->generate_tac();
+		string t1 = getNewTemp();
+		string t2 = getNewSpecialTemp();
+		string l1 = getNewLabel();
+		string l2 = getNewLabel();
+		this->code = expression1->code \
+					+ t1 + "= !" + expression1->place + "\n" \
+					+ "if (" + t1 + ") goto " + l1 + "\n"   \
+					+ expression2->code \
+					+ t2 + " = " + expression2->place + "\n"  \
+					+ "goto " + l2 + "\n"  \
+					+ l1 + ": \n" + expression3->code \
+					+ t2 + " = " + expression3->place + "\n"  \
+					+ l2 + ": \n";
+		this->place = t2;
+	}
 };
 
 
@@ -392,6 +500,14 @@ public:
 		}
 		return 0;
 	}
+
+	virtual void generate_tac(){
+		LHS->generate_tac();
+		RHS->generate_tac();
+		string c1 = LHS->place + " = " + RHS->place + "\n";
+		this->code = RHS->code + c1;
+		this->place = "";
+	}
 };
 
 class Read_Stmt : public Statement{
@@ -413,6 +529,11 @@ public:
 		return 0;
 	}
 
+	virtual void generate_tac(){
+		var_name->generate_tac();
+		this->place = "";
+		this->code = "read " + var_name->place + "\n";
+	}
 };
 
 
@@ -435,6 +556,12 @@ public:
 		}
 		return 0;
 	}
+
+	virtual void generate_tac(){
+		expression->generate_tac();
+		this->place = "";
+		this->code = expression->code + "write " + expression->place + "\n";
+	}
 };
 
 class Stmtlist : public AST {
@@ -454,5 +581,15 @@ public:
             i->infer_type(symtab);
         }
 		return 0;
+	}
+
+	virtual void generate_tac(){
+		string s;
+		for(Statement* it : statements){
+			it->generate_tac();
+			s += it->code;
+		}
+		this->code = s;
+		this->place = "";
 	}
 };

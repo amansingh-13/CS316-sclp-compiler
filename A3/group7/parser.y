@@ -60,6 +60,10 @@ program
                 string k = P->print();
                 fprintf(ast_file_desc, k.c_str());
             }
+
+            auto some_var = (Function *)$<pointer>2;
+            some_var->stmtlist->generate_tac();
+            cout<<some_var->stmtlist->code<<endl;
         }
         
         $<pointer>$ = P;
@@ -76,8 +80,14 @@ program
                 string k = P->print();
                 fprintf(ast_file_desc, k.c_str());
             }
+
+            auto some_var = (Function *)$<pointer>1;
+            some_var->stmtlist->generate_tac();
+            cout<<some_var->stmtlist->code<<endl;
         }
         $<pointer>$ = P;
+
+        
      }
 ;
 
