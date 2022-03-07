@@ -71,7 +71,7 @@ class Number_Expr_Int : public Base_Expr {
 public:
 	virtual string print(int num_spaces)
 	{
-		int parsed_val = stoi(value); // TODO
+		int parsed_val = atoi(value.c_str()); // TODO
 		return "Num : " + to_string(parsed_val) + "<int>";
 	}
 
@@ -85,7 +85,7 @@ class Number_Expr_Float : public Base_Expr {
 public:
 	virtual string print(int num_spaces)
 	{
-		float parsed_val = stof(value); // TODO
+		float parsed_val = atof(value.c_str()); // TODO
         ostringstream temp; 
         temp.precision(2);
         temp << fixed << parsed_val;
