@@ -41,7 +41,7 @@ read	{ FUN("READ", READ) }
 
 "<="		{ FUN("LESS_THAN_EQUAL", LE) } 
 ">="		{ FUN("GREATER_THAN_EQUAL", GE) } 
-"!="		{ FUN("NE", NE) } 
+"!="		{ FUN("NOT_EQUAL", NE) } 
 "<"		{ FUN("LESS_THAN", LT) } 
 ">"		{ FUN("GREATER_THAN", GT) } 
 "=="		{ FUN("EQUAL", EQ) } 
