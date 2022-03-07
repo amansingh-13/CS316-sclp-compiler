@@ -435,8 +435,6 @@ int main(int argc, char* argv[]){
         else{
             if(!file_found){
                 filename = argv[i]; 
-            filename = argv[i];        
-                filename = argv[i]; 
                 file_found = true;    
             }
             else{

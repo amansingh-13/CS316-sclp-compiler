@@ -13,14 +13,34 @@ extern int yyerror(char *);
 #define TYPE_FUNCTION 5
 #define TYPE_INT    6
 
+int tempIndex = 0;
+int labelIndex = 0;
+int specialTempIndex = 0;
+
+string getNewTemp(){
+	return "temp"+string(tempIndex++);
+}
+
+string getNewLabel(){
+	return "Label"+string(labelIndex++);
+}
+
+string getNewSpecialTemp(){
+	return "stemp"+string(specialTempIndex++);
+}
+
+
 
 typedef map<string, int> SymTab; 
 
 
 class AST {
 public:
+	string place;
+	string code;
 	virtual string print(int num_spaces) = 0;
 	virtual int infer_type(SymTab* symtab) = 0;
+	virtual void generate_tac() = 0;
 };
 
 class Expression : public AST {
@@ -64,6 +84,10 @@ public:
 		}
 		this->type = it->second;
 		return it->second;
+	}
+
+	virtual void generate_tac(){
+
 	}
 };
 
