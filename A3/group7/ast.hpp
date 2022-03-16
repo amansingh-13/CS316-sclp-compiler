@@ -257,6 +257,12 @@ public:
 };
 
 class Boolean_Expr : public Binary_Expr {
+private:
+	string get_op_lexeme(){
+		if      (op == "AND") return "&&";
+		else if (op == "OR" ) return "||";
+		else return "err"; // UNREACHABLE
+	}
 public:
 	string op;
 	virtual string print(int num_spaces){
@@ -287,14 +293,23 @@ public:
 		this->left->generate_tac();
 		this->right->generate_tac();
 		string var = getNewTemp();
-		string op_here = op; //TODO
-		string c3 = var + " = " + this->left->place + op_here + this->right->place + "\n";
+		string c3 = var + " = " + this->left->place + get_op_lexeme() + this->right->place + "\n";
 		this->place = var;
 		this->code = this->left->code + this->right->code + c3;
 	}
 };
 
 class Relational_Expr : public Binary_Expr {
+private:
+	string get_op_lexeme(){
+		if      (op == "LT") return "<" ;
+		else if (op == "LE") return "<=";
+		else if (op == "GT") return ">" ;
+		else if (op == "GE") return ">=";
+		else if (op == "NE") return "!=";
+		else if (op == "EQ") return "==";
+		else return "err"; // UNREACHABLE
+	}
 public:
 	string op;
 	virtual string print(int num_spaces){
@@ -325,8 +340,7 @@ public:
 		this->left->generate_tac();
 		this->right->generate_tac();
 		string var = getNewTemp();
-		string op_here = op; //TODO
-		string c3 = var + " = " + this->left->place + " " + op_here + " " + this->right->place + "\n";
+		string c3 = var + " = " + this->left->place + " " + get_op_lexeme() + " " + this->right->place + "\n";
 		this->place = var;
 		this->code = this->left->code + this->right->code + c3;
 	}
