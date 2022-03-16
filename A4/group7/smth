@@ -30,4 +30,50 @@
              Condition: NE<bool>
                L_Opd (Name : x_<int>)
                R_Opd (Num : 5<int>))
+         While: 
+           Condition (
+             Condition: GT<bool>
+               L_Opd (Name : x_<int>)
+               R_Opd (Num : 5<int>))
+           Body (
+             Asgn:
+               LHS (Name : x_<int>)
+               RHS (
+                 Arith: Mult<int>
+                   L_Opd (Name : x_<int>)
+                   R_Opd (Name : x_<int>))
+             Do:
+               Body (
+                 If: 
+                   Condition (
+                     Condition: LT<bool>
+                       L_Opd (Name : x_<int>)
+                       R_Opd (Num : 12<int>))
+                   Then (
+                     Asgn:
+                       LHS (Name : x_<int>)
+                       RHS (Num : 9<int>))
+                   Else (
+                     If: 
+                       Condition (
+                         Condition: GT<bool>
+                           L_Opd (Name : x_<int>)
+                           R_Opd (Num : 12<int>))
+                       Then (
+                         Asgn:
+                           LHS (Name : x_<int>)
+                           RHS (Num : 18<int>)
+                         Asgn:
+                           LHS (Name : x_<int>)
+                           RHS (Num : 78<int>))
+                       Else (
+                         Asgn:
+                           LHS (Name : x_<int>)
+                           RHS (Num : 90<int>)
+                         Write: Name : x_<int>)))
+               While Condition (
+                 Condition: NE<bool>
+                   L_Opd (Name : x_<int>)
+                   R_Opd (Num : 0<int>))
+             Write: Name : x_<int>)
 **END: Abstract Syntax Tree 

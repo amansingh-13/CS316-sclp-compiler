@@ -9,4 +9,29 @@ void main(){
     do 
     x = 5;
     while (x != 5);
+
+    while(x > 5){
+        x = x*x;
+        do {
+            if(x<12){
+                x = 9;
+            }
+            else if (x>12) {
+                x = 18;
+                {
+                    x = 78;
+                }
+            }
+            else {
+                {
+                    {
+                        x = 90;
+                    }
+                }
+                print x;
+            }
+        }
+        while (x != 0);
+        print x;
+    }
 }

@@ -45,7 +45,9 @@ public:
 		for(auto it : *Param_List){
 			rv += "\t\t" + it.first + "_  Type:" + print_type(it.second) + "\n";
 		}
+        rv += "**BEGIN: Abstract Syntax Tree ";
 		rv += stmtlist->print();
+        rv += "\n**END: Abstract Syntax Tree \n";
 		return rv;
 	}
 

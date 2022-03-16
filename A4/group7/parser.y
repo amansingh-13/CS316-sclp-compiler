@@ -377,7 +377,11 @@ while_statement
 ;
 
 compound_statement
-    : LEFT_CURLY_BRACKET statement_list RIGHT_CURLY_BRACKET
+    : LEFT_CURLY_BRACKET statement_list RIGHT_CURLY_BRACKET {
+                                                                auto cs = new Compound_Statement();
+                                                                cs->stmts = $<stmtlist>2;
+                                                                $<stmt>$ = cs;
+                                                            }
 ;
 
 variable_as_operand

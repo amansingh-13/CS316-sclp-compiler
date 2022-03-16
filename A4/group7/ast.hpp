@@ -709,18 +709,14 @@ public:
 
 };
 
-
-
-
 class Stmtlist : public AST {
 public:
 	vector<Statement*> statements;
 	virtual string print(int num_spaces=9){
-		string rv = "**BEGIN: Abstract Syntax Tree ";
+		string rv = "";
 		for(Statement* it : statements){
 			rv += it->print(num_spaces);
 		}
-		rv += "\n**END: Abstract Syntax Tree \n";
 		return rv;
 	}
 
@@ -744,4 +740,23 @@ public:
 		this->code = s;
 		this->place = "";
 	}
+};
+
+class Compound_Statement : public Statement{
+public:
+	Stmtlist* stmts;
+
+	virtual string print(int num_spaces){
+		return stmts->print(num_spaces);
+	}
+
+	virtual int infer_type(SymTab* symtab){
+		stmts->infer_type(symtab);
+		return 0;
+	}
+
+	virtual void generate_tac(){
+
+	}
+
 };
