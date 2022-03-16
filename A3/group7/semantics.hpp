@@ -55,6 +55,9 @@ public:
 
     string print_tac(){
         string rv = "**PROCEDURE: " + Name + "\n";
+        if(stmtlist->statements.size() == 0){
+            rv = "";
+        }
         rv += stmtlist->code;
         return rv;
     }

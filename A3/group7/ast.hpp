@@ -612,6 +612,9 @@ public:
 			s += it->code;
 		}
 		s += "**END: Three Address Code Statements\n";
+		if(statements.size() == 0){
+			s = "";
+		}
 		this->code = s;
 		this->place = "";
 	}
