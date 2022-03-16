@@ -49,6 +49,16 @@ public:
 		return rv;
 	}
 
+    void generate_tac(){
+        stmtlist->generate_tac();
+    }
+
+    string print_tac(){
+        string rv = "**PROCEDURE: " + Name + "\n";
+        rv += stmtlist->code;
+        return rv;
+    }
+
 };
 
 class Program{
@@ -68,6 +78,24 @@ public:
         for(auto i: functions){
             if(i->decl_or_def == IS_DEFINITION){
                 s += i->print();
+            }
+        }
+        return s;
+    }
+
+    void generate_tac(){
+        for(auto i: functions){
+            if(i->decl_or_def == IS_DEFINITION){
+                i->generate_tac();
+            }
+        }
+    }
+
+    string print_tac(){
+        string s = "";
+        for(auto i: functions){
+            if(i->decl_or_def == IS_DEFINITION){
+                s += i->print_tac();
             }
         }
         return s;

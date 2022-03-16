@@ -129,7 +129,11 @@ public:
 
 	virtual void generate_tac(){
 		this->code = "";
-		this->place = to_string(strtod(value.c_str(), NULL));
+		double parsed_val = strtod(value.c_str(), NULL);
+        ostringstream temp; 
+        temp.precision(2);
+        temp << fixed << parsed_val;
+		this->place = temp.str();
 	}
 };
 
@@ -186,7 +190,7 @@ public:
 		this->left->generate_tac();
 		this->right->generate_tac();
 		string var = getNewTemp();
-		string c3 = var + " = " + this->left->place + "/" + this->right->place + "\n";
+		string c3 = var + " = " + this->left->place + " / " + this->right->place + "\n";
 		this->place = var;
 		this->code = this->left->code + this->right->code + c3;
 	}
@@ -207,7 +211,7 @@ public:
 		this->left->generate_tac();
 		this->right->generate_tac();
 		string var = getNewTemp();
-		string c3 = var + " = " + this->left->place + "*" + this->right->place + "\n";
+		string c3 = var + " = " + this->left->place + " * " + this->right->place + "\n";
 		this->place = var;
 		this->code = this->left->code + this->right->code + c3;
 	}
@@ -250,7 +254,7 @@ public:
 		this->left->generate_tac();
 		this->right->generate_tac();
 		string var = getNewTemp();
-		string c3 = var + " = " + this->left->place + "+" + this->right->place + "\n";
+		string c3 = var + " = " + this->left->place + " + " + this->right->place + "\n";
 		this->place = var;
 		this->code = this->left->code + this->right->code + c3;
 	}
@@ -464,14 +468,18 @@ public:
 
 	virtual void generate_tac(){
 		expression1->generate_tac();
-		expression2->generate_tac();
-		expression3->generate_tac();
-		string t1 = getNewTemp();
+		
 		string t2 = getNewSpecialTemp();
 		string l1 = getNewLabel();
 		string l2 = getNewLabel();
+
+		expression2->generate_tac();
+		expression3->generate_tac();
+		
+		string t1 = getNewTemp();
+
 		this->code = expression1->code \
-					+ t1 + "= !" + expression1->place + "\n" \
+					+ t1 + " = !" + expression1->place + "\n" \
 					+ "if (" + t1 + ") goto " + l1 + "\n"   \
 					+ expression2->code \
 					+ t2 + " = " + expression2->place + "\n"  \
@@ -598,11 +606,12 @@ public:
 	}
 
 	virtual void generate_tac(){
-		string s;
+		string s = "**BEGIN: Three Address Code Statements\n";
 		for(Statement* it : statements){
 			it->generate_tac();
 			s += it->code;
 		}
+		s += "**END: Three Address Code Statements\n";
 		this->code = s;
 		this->place = "";
 	}
