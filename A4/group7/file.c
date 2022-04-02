@@ -5,4 +5,8 @@ void main(){
     x = 5;
     else 
     f = 2;
+
+    do 
+    x = 5;
+    while (x != 5);
 }

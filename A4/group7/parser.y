@@ -359,11 +359,21 @@ if_statement
 ;
 
 do_while_statement 
-    : DO statement WHILE LEFT_ROUND_BRACKET expression RIGHT_ROUND_BRACKET SEMICOLON
+    : DO statement WHILE LEFT_ROUND_BRACKET expression RIGHT_ROUND_BRACKET SEMICOLON    {
+                                                                                            auto ws = new DoWhile_Statement();
+                                                                                            ws->condition = $<exp>5;
+                                                                                            ws->body = $<stmt>2;
+                                                                                            $<stmt>$ = ws;
+                                                                                        }
 ;
 
 while_statement 
-    : WHILE LEFT_ROUND_BRACKET expression RIGHT_ROUND_BRACKET statement
+    : WHILE LEFT_ROUND_BRACKET expression RIGHT_ROUND_BRACKET statement         {
+                                                                                    auto ws = new While_Statement();
+                                                                                    ws->condition = $<exp>3;
+                                                                                    ws->body = $<stmt>5;
+                                                                                    $<stmt>$ = ws;
+                                                                                }
 ;
 
 compound_statement

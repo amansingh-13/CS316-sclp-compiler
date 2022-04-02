@@ -21,4 +21,13 @@
                  Asgn:
                    LHS (Name : f_<int>)
                    RHS (Num : 2<int>)))
+         Do:
+           Body (
+             Asgn:
+               LHS (Name : x_<int>)
+               RHS (Num : 5<int>))
+           While Condition (
+             Condition: NE<bool>
+               L_Opd (Name : x_<int>)
+               R_Opd (Num : 5<int>))
 **END: Abstract Syntax Tree 

@@ -631,6 +631,87 @@ public:
 };
 
 
+
+class While_Statement : public Statement{
+public:
+	Expression* condition;
+	Statement* body;
+
+	virtual string print(int num_spaces){
+		string ws1 = string(num_spaces, ' ');
+		string ws2 = string(num_spaces+2, ' ');
+		string total = "\n" + ws1 + "While: \n" \
+					+ ws2 + "Condition (" \
+					+ condition->print(num_spaces+4) + ")\n" \
+					+ ws2 + "Body (" \
+					+ body->print(num_spaces+4) + ")";
+
+		return total;
+	}
+
+	virtual int infer_type(SymTab* symtab){
+		
+		condition->infer_type(symtab);
+		body->infer_type(symtab);
+		
+
+		if(condition->type != TYPE_BOOL){
+			yyerror("If Condition type must be boolean \n");
+			return -1;
+		}
+
+		return 0;
+	}
+
+	virtual void generate_tac(){
+
+	}
+
+};
+
+
+
+
+
+class DoWhile_Statement : public Statement{
+public:
+	Expression* condition;
+	Statement* body;
+
+	virtual string print(int num_spaces){
+		string ws1 = string(num_spaces, ' ');
+		string ws2 = string(num_spaces+2, ' ');
+		string total = "\n" + ws1 + "Do:\n" \
+					+ ws2 + "Body (" \
+					+ body->print(num_spaces+4) + ")\n" \
+					+ ws2 + "While Condition (" \
+					+ condition->print(num_spaces+4) + ")";
+
+		return total;
+	}
+
+	virtual int infer_type(SymTab* symtab){
+		
+		condition->infer_type(symtab);
+		body->infer_type(symtab);
+		
+		if(condition->type != TYPE_BOOL){
+			yyerror("If Condition type must be boolean \n");
+			return -1;
+		}
+
+		return 0;
+	}
+
+	virtual void generate_tac(){
+
+	}
+
+};
+
+
+
+
 class Stmtlist : public AST {
 public:
 	vector<Statement*> statements;
