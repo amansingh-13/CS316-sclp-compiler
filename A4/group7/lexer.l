@@ -18,6 +18,10 @@ void	{ FUN("VOID", VOID) }
 float	{ FUN("FLOAT", FLOAT) }
 string	{ FUN("STRING", STRING) }
 bool	{ FUN("BOOL", BOOL) }
+do		{ FUN("DO", DO) }
+while	{ FUN("WHILE", WHILE) }
+if 		{ FUN("IF", IF) }
+else 	{ FUN("ELSE", ELSE) }
 =	{ FUN("ASSIGN_OP", ASSIGN_OP) }
 ;	{ FUN("SEMICOLON", SEMICOLON) }
 \(	{ FUN("LEFT_ROUND_BRACKET", LEFT_ROUND_BRACKET) }

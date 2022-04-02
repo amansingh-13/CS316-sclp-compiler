@@ -1,0 +1,31 @@
+**PROCEDURE: main
+**BEGIN: Three Address Code Statements
+	test_ = 0
+	loop_ = 10
+Label3:
+	temp0 = loop_ > 1
+	temp6 = ! temp0
+	if(temp6) goto Label4
+	temp1 = loop_ - 1
+	loop_ = temp1
+	temp2 = loop_ == 0
+	temp3 = ! temp2
+	if(temp3) goto Label1
+	write  loop_
+	goto Label0
+Label1:
+	temp4 = loop_ != 0
+	temp5 = ! temp4
+	if(temp5) goto Label2
+	goto Label2
+Label2:
+Label0:
+	goto Label3
+Label4:
+Label5:
+	temp7 = loop_ + 1
+	loop_ = temp7
+	temp8 = loop_ < 10
+	if(temp8) goto Label5
+	write  loop_
+**END: Three Address Code Statements

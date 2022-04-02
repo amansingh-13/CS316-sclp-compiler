@@ -33,11 +33,13 @@ FILE *ast_file_desc, *tac_file_desc;
 %token QUESTION_MARK COLON
 %token AND OR NOT
 %token LT LE GT GE NE EQ
+%token DO WHILE IF ELSE
 %right QUESTION_MARK COLON
 %left OR
 %left AND 
 %right NOT
 %nonassoc NE EQ LE LT GE GT
+%right IF ELSE
 %left PLUS MINUS 
 %left MULT DIV
 %right UMINUS
@@ -133,7 +135,6 @@ global_decl_statement_list
 
 func_decl 
     : func_header LEFT_ROUND_BRACKET formal_param_list RIGHT_ROUND_BRACKET SEMICOLON    {
-		
 		Function* func = (Function *)$<pointer>1;
         func->decl_or_def = IS_DECLARATION;	
         vector<pair<string, int>>* params = (vector<pair<string, int>>*)$<pointer>3;
@@ -322,6 +323,10 @@ statement:
     assignment_statement        {    $<stmt>$ = $<stmt>1;    }
     | print_statement           {    $<stmt>$ = $<stmt>1;    }
     | read_statement            {    $<stmt>$ = $<stmt>1;    }
+    | if_statement
+    | do_while_statement
+    | while_statement
+    | compound_statement
 ;
 
 assignment_statement
@@ -330,6 +335,27 @@ assignment_statement
                                                                  As->RHS = $<exp>3;
                                                                  $<stmt>$ = As;
                                                             }
+;
+
+if_condition
+    : LEFT_ROUND_BRACKET expression RIGHT_ROUND_BRACKET
+;
+
+if_statement 
+    : IF if_condition statement ELSE statement
+    | IF if_condition statement
+;
+
+do_while_statement 
+    : DO statement WHILE LEFT_ROUND_BRACKET expression RIGHT_ROUND_BRACKET SEMICOLON
+;
+
+while_statement 
+    : WHILE LEFT_ROUND_BRACKET expression RIGHT_ROUND_BRACKET statement
+;
+
+compound_statement
+    : LEFT_CURLY_BRACKET statement_list RIGHT_CURLY_BRACKET
 ;
 
 variable_as_operand

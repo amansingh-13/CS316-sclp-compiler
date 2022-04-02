@@ -12,16 +12,17 @@ void main()
         {
             print loop;
         }
-        else
-        {
-            print test;
+        else if(loop!=0)
+        {   
+            
         }
+        
         
     }
     do
     {
         loop=loop + 1;
-        
     } while(loop<10);
+
     print loop;
 }
