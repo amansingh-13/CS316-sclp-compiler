@@ -1,6 +1,3 @@
-State 107 conflicts: 1 shift/reduce
-
-
 Grammar
 
     0 $accept: program $end
@@ -1555,7 +1552,6 @@ State 107
 
     ELSE  shift, and go to state 126
 
-    ELSE      [reduce using rule 44 (if_statement)]
     $default  reduce using rule 44 (if_statement)
 
 

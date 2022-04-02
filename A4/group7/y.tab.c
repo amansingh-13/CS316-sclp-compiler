@@ -532,10 +532,10 @@ static const yytype_uint16 yyrline[] =
      155,   167,   188,   204,   212,   223,   235,   236,   237,   238,
      242,   243,   247,   248,   265,   285,   293,   303,   307,   308,
      309,   310,   311,   315,   319,   323,   324,   325,   326,   327,
-     328,   329,   333,   341,   345,   346,   350,   354,   358,   362,
-     366,   370,   378,   386,   387,   388,   389,   390,   392,   394,
-     400,   405,   410,   411,   412,   413,   417,   422,   427,   432,
-     437,   442,   449,   450,   451
+     328,   329,   333,   341,   345,   352,   362,   366,   370,   374,
+     378,   382,   390,   398,   399,   400,   401,   402,   404,   406,
+     412,   417,   422,   423,   424,   425,   429,   434,   439,   444,
+     449,   454,   461,   462,   463
 };
 #endif
 
@@ -1844,6 +1844,30 @@ yyreduce:
 #line 1845 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 38:
+#line 326 "parser.y" /* yacc.c:1646  */
+    {    (yyval.stmt) = (yyvsp[0].stmt);    }
+#line 1851 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 39:
+#line 327 "parser.y" /* yacc.c:1646  */
+    {    (yyval.stmt) = (yyvsp[0].stmt);    }
+#line 1857 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 40:
+#line 328 "parser.y" /* yacc.c:1646  */
+    {    (yyval.stmt) = (yyvsp[0].stmt);    }
+#line 1863 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 41:
+#line 329 "parser.y" /* yacc.c:1646  */
+    {    (yyval.stmt) = (yyvsp[0].stmt);    }
+#line 1869 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 42:
 #line 333 "parser.y" /* yacc.c:1646  */
     {    auto As = new Assignment_Stmt();  
@@ -1851,203 +1875,233 @@ yyreduce:
                                                                  As->RHS = (yyvsp[-1].exp);
                                                                  (yyval.stmt) = As;
                                                             }
-#line 1855 "y.tab.c" /* yacc.c:1646  */
+#line 1879 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 43:
+#line 341 "parser.y" /* yacc.c:1646  */
+    {    (yyval.exp) = (yyvsp[-1].exp);    }
+#line 1885 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 44:
+#line 345 "parser.y" /* yacc.c:1646  */
+    {
+                                                        auto is = new If_Statement();
+                                                        is->if_condition = (yyvsp[-3].exp);
+                                                        is->ThenPart = (yyvsp[-2].stmt);
+                                                        is->ElsePart = (yyvsp[0].stmt);
+                                                        (yyval.stmt) = is;
+                                                    }
+#line 1897 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 45:
+#line 352 "parser.y" /* yacc.c:1646  */
+    {
+                                                        auto is = new If_Statement();
+                                                        is->if_condition = (yyvsp[-1].exp);
+                                                        is->ThenPart = (yyvsp[0].stmt);
+                                                        is->ElsePart = NULL;
+                                                        (yyval.stmt) = is;
+                                                    }
+#line 1909 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 362 "parser.y" /* yacc.c:1646  */
+#line 374 "parser.y" /* yacc.c:1646  */
     {  (yyval.exp) = (yyvsp[0].exp);     }
-#line 1861 "y.tab.c" /* yacc.c:1646  */
+#line 1915 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 366 "parser.y" /* yacc.c:1646  */
+#line 378 "parser.y" /* yacc.c:1646  */
     {  auto i = new Name_Expr();  i->value = string(yylval.str);  (yyval.exp) = i;   }
-#line 1867 "y.tab.c" /* yacc.c:1646  */
+#line 1921 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 371 "parser.y" /* yacc.c:1646  */
+#line 383 "parser.y" /* yacc.c:1646  */
     {   auto Ws = new Write_Stmt();
 					    Ws->expression = (yyvsp[-1].exp);
 					    (yyval.stmt) = Ws;
 					}
-#line 1876 "y.tab.c" /* yacc.c:1646  */
+#line 1930 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 379 "parser.y" /* yacc.c:1646  */
+#line 391 "parser.y" /* yacc.c:1646  */
     {   auto Rs = new Read_Stmt();
 					    Rs->var_name = (yyvsp[-1].exp);
 					    (yyval.stmt) = Rs;
 					}
-#line 1885 "y.tab.c" /* yacc.c:1646  */
+#line 1939 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 386 "parser.y" /* yacc.c:1646  */
+#line 398 "parser.y" /* yacc.c:1646  */
     { auto e = new Plus_Expr()  ; e->left = (yyvsp[-2].exp); e->right = (yyvsp[0].exp); (yyval.exp) = e; }
-#line 1891 "y.tab.c" /* yacc.c:1646  */
+#line 1945 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 387 "parser.y" /* yacc.c:1646  */
+#line 399 "parser.y" /* yacc.c:1646  */
     { auto e = new Minus_Expr() ; e->left = (yyvsp[-2].exp); e->right = (yyvsp[0].exp); (yyval.exp) = e; }
-#line 1897 "y.tab.c" /* yacc.c:1646  */
+#line 1951 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 388 "parser.y" /* yacc.c:1646  */
+#line 400 "parser.y" /* yacc.c:1646  */
     { auto e = new Mult_Expr()  ; e->left = (yyvsp[-2].exp); e->right = (yyvsp[0].exp); (yyval.exp) = e; }
-#line 1903 "y.tab.c" /* yacc.c:1646  */
+#line 1957 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 389 "parser.y" /* yacc.c:1646  */
+#line 401 "parser.y" /* yacc.c:1646  */
     { auto e = new Div_Expr()   ; e->left = (yyvsp[-2].exp); e->right = (yyvsp[0].exp); (yyval.exp) = e; }
-#line 1909 "y.tab.c" /* yacc.c:1646  */
+#line 1963 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 391 "parser.y" /* yacc.c:1646  */
+#line 403 "parser.y" /* yacc.c:1646  */
     { auto e = new UMinus_Expr(); e->expression = (yyvsp[0].exp); (yyval.exp) = e; }
-#line 1915 "y.tab.c" /* yacc.c:1646  */
+#line 1969 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 393 "parser.y" /* yacc.c:1646  */
+#line 405 "parser.y" /* yacc.c:1646  */
     { (yyval.exp) = (yyvsp[-1].exp); }
-#line 1921 "y.tab.c" /* yacc.c:1646  */
+#line 1975 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 395 "parser.y" /* yacc.c:1646  */
+#line 407 "parser.y" /* yacc.c:1646  */
     {
 									auto e = new Conditional_Expr(); 
                                     e->expression1 = (yyvsp[-4].exp);   e->expression2 = (yyvsp[-2].exp);   e->expression3 = (yyvsp[0].exp);
                                     (yyval.exp) = e;
 								}
-#line 1931 "y.tab.c" /* yacc.c:1646  */
+#line 1985 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 400 "parser.y" /* yacc.c:1646  */
+#line 412 "parser.y" /* yacc.c:1646  */
     { 
                                     auto e = new Boolean_Expr(); 
 					                e->left = (yyvsp[-2].exp); e->right = (yyvsp[0].exp); e->op = string("AND");
 					                (yyval.exp) = e; 
                                 }
-#line 1941 "y.tab.c" /* yacc.c:1646  */
+#line 1995 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 405 "parser.y" /* yacc.c:1646  */
+#line 417 "parser.y" /* yacc.c:1646  */
     {
                                     auto e = new Boolean_Expr(); 
 					                e->left = (yyvsp[-2].exp); e->right = (yyvsp[0].exp); e->op = string("OR");
 				                    (yyval.exp) = e; 
 					            }
-#line 1951 "y.tab.c" /* yacc.c:1646  */
+#line 2005 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 410 "parser.y" /* yacc.c:1646  */
+#line 422 "parser.y" /* yacc.c:1646  */
     { auto e = new Not_Expr(); e->expression = (yyvsp[0].exp); (yyval.exp) = e; }
-#line 1957 "y.tab.c" /* yacc.c:1646  */
+#line 2011 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 411 "parser.y" /* yacc.c:1646  */
+#line 423 "parser.y" /* yacc.c:1646  */
     { (yyval.exp) = (yyvsp[0].exp); }
-#line 1963 "y.tab.c" /* yacc.c:1646  */
+#line 2017 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 412 "parser.y" /* yacc.c:1646  */
+#line 424 "parser.y" /* yacc.c:1646  */
     { (yyval.exp) = (yyvsp[0].exp); }
-#line 1969 "y.tab.c" /* yacc.c:1646  */
+#line 2023 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 413 "parser.y" /* yacc.c:1646  */
+#line 425 "parser.y" /* yacc.c:1646  */
     { (yyval.exp) = (yyvsp[0].exp); }
-#line 1975 "y.tab.c" /* yacc.c:1646  */
+#line 2029 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 418 "parser.y" /* yacc.c:1646  */
+#line 430 "parser.y" /* yacc.c:1646  */
     {  auto e = new Relational_Expr(); 
 					   e->left = (yyvsp[-2].exp); e->right = (yyvsp[0].exp); e->op = string("LT");
 					   (yyval.exp) = e; 
 					}
-#line 1984 "y.tab.c" /* yacc.c:1646  */
+#line 2038 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 423 "parser.y" /* yacc.c:1646  */
+#line 435 "parser.y" /* yacc.c:1646  */
     {  auto e = new Relational_Expr(); 
 					   e->left = (yyvsp[-2].exp); e->right = (yyvsp[0].exp); e->op = string("LE");
 					   (yyval.exp) = e; 
 					}
-#line 1993 "y.tab.c" /* yacc.c:1646  */
+#line 2047 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 428 "parser.y" /* yacc.c:1646  */
+#line 440 "parser.y" /* yacc.c:1646  */
     {  auto e = new Relational_Expr(); 
 					   e->left = (yyvsp[-2].exp); e->right = (yyvsp[0].exp); e->op = string("GT");
 					   (yyval.exp) = e; 
 					}
-#line 2002 "y.tab.c" /* yacc.c:1646  */
+#line 2056 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 433 "parser.y" /* yacc.c:1646  */
+#line 445 "parser.y" /* yacc.c:1646  */
     {  auto e = new Relational_Expr(); 
 					   e->left = (yyvsp[-2].exp); e->right = (yyvsp[0].exp); e->op = string("GE");
 					   (yyval.exp) = e; 
 					}
-#line 2011 "y.tab.c" /* yacc.c:1646  */
+#line 2065 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 438 "parser.y" /* yacc.c:1646  */
+#line 450 "parser.y" /* yacc.c:1646  */
     {  auto e = new Relational_Expr(); 
 					   e->left = (yyvsp[-2].exp); e->right = (yyvsp[0].exp); e->op = string("NE");
 					   (yyval.exp) = e; 
 					}
-#line 2020 "y.tab.c" /* yacc.c:1646  */
+#line 2074 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 443 "parser.y" /* yacc.c:1646  */
+#line 455 "parser.y" /* yacc.c:1646  */
     {  auto e = new Relational_Expr(); 
 					   e->left = (yyvsp[-2].exp); e->right = (yyvsp[0].exp); e->op = string("EQ");
 					   (yyval.exp) = e; 
 					}
-#line 2029 "y.tab.c" /* yacc.c:1646  */
+#line 2083 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 449 "parser.y" /* yacc.c:1646  */
+#line 461 "parser.y" /* yacc.c:1646  */
     {  auto i = new Number_Expr_Int();  i->value = string(yylval.str);  (yyval.exp) = i;   }
-#line 2035 "y.tab.c" /* yacc.c:1646  */
+#line 2089 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 450 "parser.y" /* yacc.c:1646  */
+#line 462 "parser.y" /* yacc.c:1646  */
     {  auto i = new Number_Expr_Float();  i->value = string(yylval.str);  (yyval.exp) = i;   }
-#line 2041 "y.tab.c" /* yacc.c:1646  */
+#line 2095 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 451 "parser.y" /* yacc.c:1646  */
+#line 463 "parser.y" /* yacc.c:1646  */
     {  auto i = new String_Expr();  i->value = string(yylval.str);  (yyval.exp) = i;   }
-#line 2047 "y.tab.c" /* yacc.c:1646  */
+#line 2101 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2051 "y.tab.c" /* yacc.c:1646  */
+#line 2105 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2275,7 +2329,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 454 "parser.y" /* yacc.c:1906  */
+#line 466 "parser.y" /* yacc.c:1906  */
 
 
 int main(int argc, char* argv[]){

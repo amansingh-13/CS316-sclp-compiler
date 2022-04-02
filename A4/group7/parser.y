@@ -323,10 +323,10 @@ statement:
     assignment_statement        {    $<stmt>$ = $<stmt>1;    }
     | print_statement           {    $<stmt>$ = $<stmt>1;    }
     | read_statement            {    $<stmt>$ = $<stmt>1;    }
-    | if_statement
-    | do_while_statement
-    | while_statement
-    | compound_statement
+    | if_statement              {    $<stmt>$ = $<stmt>1;    }
+    | do_while_statement        {    $<stmt>$ = $<stmt>1;    }
+    | while_statement           {    $<stmt>$ = $<stmt>1;    }
+    | compound_statement        {    $<stmt>$ = $<stmt>1;    }
 ;
 
 assignment_statement
@@ -338,12 +338,24 @@ assignment_statement
 ;
 
 if_condition
-    : LEFT_ROUND_BRACKET expression RIGHT_ROUND_BRACKET
+    : LEFT_ROUND_BRACKET expression RIGHT_ROUND_BRACKET     {    $<exp>$ = $<exp>2;    }
 ;
 
 if_statement 
-    : IF if_condition statement ELSE statement
-    | IF if_condition statement
+    : IF if_condition statement ELSE statement      {
+                                                        auto is = new If_Statement();
+                                                        is->if_condition = $<exp>2;
+                                                        is->ThenPart = $<stmt>3;
+                                                        is->ElsePart = $<stmt>5;
+                                                        $<stmt>$ = is;
+                                                    }    
+    | IF if_condition statement                     {
+                                                        auto is = new If_Statement();
+                                                        is->if_condition = $<exp>2;
+                                                        is->ThenPart = $<stmt>3;
+                                                        is->ElsePart = NULL;
+                                                        $<stmt>$ = is;
+                                                    }
 ;
 
 do_while_statement 

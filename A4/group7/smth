@@ -1,0 +1,14 @@
+**PROCEDURE: main
+	Return Type: <void>
+	Formal Parameters:
+**BEGIN: Abstract Syntax Tree 
+         If: 
+           Condition (
+             Condition: EQ<bool>
+               L_Opd (Name : x_<int>)
+               R_Opd (Num : 0<int>))
+           Then (
+             Asgn:
+               LHS (Name : x_<int>)
+               RHS (Num : 5<int>))
+**END: Abstract Syntax Tree 

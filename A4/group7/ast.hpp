@@ -586,6 +586,51 @@ public:
 	}
 };
 
+
+class If_Statement : public Statement{
+public:
+	Expression* if_condition;
+	Statement* ThenPart;
+	Statement* ElsePart;
+
+	virtual string print(int num_spaces){
+		string ws1 = string(num_spaces, ' ');
+		string ws2 = string(num_spaces+2, ' ');
+		string total = ws1 + "If:\n" \
+					+ ws2 + "Condition (\n" \
+					+ if_condition->print(num_spaces+2) + ")\n" \
+					+ ws2 + "Then (\n" \
+					+ ThenPart->print(num_spaces+2) + ")\n";
+
+		if(ElsePart != NULL){
+			total += ws2 + "Else (\n" + ElsePart->print(num_spaces+2) + ")\n";
+		}
+
+		return total;
+	}
+
+	virtual int infer_type(SymTab* symtab){
+		
+		if_condition->infer_type(symtab);
+		ThenPart->infer_type(symtab);
+		if(ElsePart != NULL){
+			ElsePart->infer_type(symtab);
+		}
+
+		if(if_condition->type != TYPE_BOOL){
+			yyerror("If Condition type must be boolean \n");
+			return -1;
+		}
+		return 0;
+	}
+
+	virtual void generate_tac(){
+
+	}
+
+};
+
+
 class Stmtlist : public AST {
 public:
 	vector<Statement*> statements;
