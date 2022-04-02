@@ -4,11 +4,21 @@
 **BEGIN: Abstract Syntax Tree 
          If: 
            Condition (
-             Condition: EQ<bool>
+             Condition: NE<bool>
                L_Opd (Name : x_<int>)
                R_Opd (Num : 0<int>))
            Then (
-             Asgn:
-               LHS (Name : x_<int>)
-               RHS (Num : 5<int>))
+             If: 
+               Condition (
+                 Condition: EQ<bool>
+                   L_Opd (Name : x_<int>)
+                   R_Opd (Num : 0<int>))
+               Then (
+                 Asgn:
+                   LHS (Name : x_<int>)
+                   RHS (Num : 5<int>))
+               Else (
+                 Asgn:
+                   LHS (Name : f_<int>)
+                   RHS (Num : 2<int>)))
 **END: Abstract Syntax Tree 

@@ -508,9 +508,9 @@ public:
     virtual string print(int num_spaces){
         string ws1 = string(num_spaces, ' ');
         string ws2 = string(num_spaces+2, ' ');
-        string total = ws1 + "Asgn:\n" \
+        string total = "\n" + ws1 + "Asgn:\n" \
                      + ws2 + "LHS (" + LHS->print(num_spaces+4) + ")\n" \
-                     + ws2 + "RHS (" + RHS->print(num_spaces+4) + ")\n" ;
+                     + ws2 + "RHS (" + RHS->print(num_spaces+4) + ")" ;
 
         return total;
     }
@@ -538,8 +538,8 @@ public:
 
     virtual string print(int num_spaces){
         string ws1 = string(num_spaces, ' ');
-        string total = ws1 + "Read: " \
-                     + var_name->print(num_spaces+4)+ "\n";
+        string total = "\n" + ws1 + "Read: " \
+                     + var_name->print(num_spaces+4);
         return total;
     }
 
@@ -566,8 +566,8 @@ public:
 
     virtual string print(int num_spaces){
         string ws1 = string(num_spaces, ' ');
-        string total = ws1 + "Write: " \
-                     + expression->print(num_spaces+4) + "\n";
+        string total = "\n" + ws1 + "Write: " \
+                     + expression->print(num_spaces+4);
         return total;
     }
 
@@ -596,14 +596,14 @@ public:
 	virtual string print(int num_spaces){
 		string ws1 = string(num_spaces, ' ');
 		string ws2 = string(num_spaces+2, ' ');
-		string total = ws1 + "If:\n" \
-					+ ws2 + "Condition (\n" \
-					+ if_condition->print(num_spaces+2) + ")\n" \
-					+ ws2 + "Then (\n" \
-					+ ThenPart->print(num_spaces+2) + ")\n";
+		string total = "\n" + ws1 + "If: \n" \
+					+ ws2 + "Condition (" \
+					+ if_condition->print(num_spaces+4) + ")\n" \
+					+ ws2 + "Then (" \
+					+ ThenPart->print(num_spaces+4) + ")";
 
 		if(ElsePart != NULL){
-			total += ws2 + "Else (\n" + ElsePart->print(num_spaces+2) + ")\n";
+			total += "\n" + ws2 + "Else (" + ElsePart->print(num_spaces+4) + ")";
 		}
 
 		return total;
@@ -635,11 +635,11 @@ class Stmtlist : public AST {
 public:
 	vector<Statement*> statements;
 	virtual string print(int num_spaces=9){
-		string rv = "**BEGIN: Abstract Syntax Tree \n";
+		string rv = "**BEGIN: Abstract Syntax Tree ";
 		for(Statement* it : statements){
 			rv += it->print(num_spaces);
 		}
-		rv += "**END: Abstract Syntax Tree \n";
+		rv += "\n**END: Abstract Syntax Tree \n";
 		return rv;
 	}
 
