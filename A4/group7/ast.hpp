@@ -638,8 +638,9 @@ public:
 		
 
 		if(ElsePart!=NULL){
-			ElsePart->generate_tac();
 			l2 = getNewLabel();
+			ElsePart->generate_tac();
+			
 			this->code += "\nif(" + t1 + ") goto " + l2 + "\n";
 		}
 		else{
@@ -653,8 +654,6 @@ public:
 			this->code += l2 + ":\n" + ElsePart->code;
 		}
 		this->code += l1 + ":\n";
-
-
 	}
 
 };

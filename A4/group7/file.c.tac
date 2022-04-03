@@ -27,20 +27,20 @@ x_ = temp6
 Label8:
 temp7 = x_ < 12
 temp8 = ! temp7
-if(temp8) goto Label7
+if(temp8) goto Label5
 x_ = 9
 goto Label4
-Label7:
+Label5:
 temp9 = x_ > 12
 temp10 = ! temp9
-if(temp10) goto Label6
+if(temp10) goto Label7
 x_ = 18
 x_ = 78
-goto Label5
-Label6:
+goto Label6
+Label7:
 x_ = 90
 write x_
-Label5:
+Label6:
 Label4:
 temp11 = x_ != 0
 
