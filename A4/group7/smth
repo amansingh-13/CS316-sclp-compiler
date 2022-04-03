@@ -1,79 +1,27 @@
 **PROCEDURE: main
-	Return Type: <void>
-	Formal Parameters:
-**BEGIN: Abstract Syntax Tree 
-         If: 
-           Condition (
-             Condition: NE<bool>
-               L_Opd (Name : x_<int>)
-               R_Opd (Num : 0<int>))
-           Then (
-             If: 
-               Condition (
-                 Condition: EQ<bool>
-                   L_Opd (Name : x_<int>)
-                   R_Opd (Num : 0<int>))
-               Then (
-                 Asgn:
-                   LHS (Name : x_<int>)
-                   RHS (Num : 5<int>))
-               Else (
-                 Asgn:
-                   LHS (Name : f_<int>)
-                   RHS (Num : 2<int>)))
-         Do:
-           Body (
-             Asgn:
-               LHS (Name : x_<int>)
-               RHS (Num : 5<int>))
-           While Condition (
-             Condition: NE<bool>
-               L_Opd (Name : x_<int>)
-               R_Opd (Num : 5<int>))
-         While: 
-           Condition (
-             Condition: GT<bool>
-               L_Opd (Name : x_<int>)
-               R_Opd (Num : 5<int>))
-           Body (
-             Asgn:
-               LHS (Name : x_<int>)
-               RHS (
-                 Arith: Mult<int>
-                   L_Opd (Name : x_<int>)
-                   R_Opd (Name : x_<int>))
-             Do:
-               Body (
-                 If: 
-                   Condition (
-                     Condition: LT<bool>
-                       L_Opd (Name : x_<int>)
-                       R_Opd (Num : 12<int>))
-                   Then (
-                     Asgn:
-                       LHS (Name : x_<int>)
-                       RHS (Num : 9<int>))
-                   Else (
-                     If: 
-                       Condition (
-                         Condition: GT<bool>
-                           L_Opd (Name : x_<int>)
-                           R_Opd (Num : 12<int>))
-                       Then (
-                         Asgn:
-                           LHS (Name : x_<int>)
-                           RHS (Num : 18<int>)
-                         Asgn:
-                           LHS (Name : x_<int>)
-                           RHS (Num : 78<int>))
-                       Else (
-                         Asgn:
-                           LHS (Name : x_<int>)
-                           RHS (Num : 90<int>)
-                         Write: Name : x_<int>)))
-               While Condition (
-                 Condition: NE<bool>
-                   L_Opd (Name : x_<int>)
-                   R_Opd (Num : 0<int>))
-             Write: Name : x_<int>)
-**END: Abstract Syntax Tree 
+**BEGIN: Three Address Code Statements
+	x_ = 0
+	temp0 = x_ == 0
+	temp2 = ! temp0
+	if(temp2) goto Label0
+	temp1 = x_ + 1
+	x_ = temp1
+	goto Label0
+Label0:
+	temp3 = x_ == 0
+	temp5 = ! temp3
+	if(temp5) goto Label2
+	temp4 = x_ + 1
+	x_ = temp4
+	goto Label1
+Label2:
+	temp6 = x_ == 5
+	temp8 = ! temp6
+	if(temp8) goto Label4
+	temp7 = x_ - 1
+	x_ = temp7
+	goto Label3
+Label4:
+Label3:
+Label1:
+**END: Three Address Code Statements

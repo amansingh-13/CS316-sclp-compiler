@@ -625,6 +625,35 @@ public:
 	}
 
 	virtual void generate_tac(){
+		if_condition->generate_tac();
+		ThenPart->generate_tac();
+		
+		string t1 = getNewTemp();
+
+		this->place = "";
+		this->code = if_condition->code + t1 + " = ! " + if_condition->place;
+		
+		string l1 = getNewLabel();
+		string l2;
+		
+
+		if(ElsePart!=NULL){
+			ElsePart->generate_tac();
+			l2 = getNewLabel();
+			this->code += "\nif(" + t1 + ") goto " + l2 + "\n";
+		}
+		else{
+			this->code += "\nif(" + t1 + ") goto " + l1 + "\n";
+		}
+
+		
+		this->code += ThenPart->code + "goto "+ l1 + "\n";
+
+		if(ElsePart!=NULL){
+			this->code += l2 + ":\n" + ElsePart->code;
+		}
+		this->code += l1 + ":\n";
+
 
 	}
 
@@ -664,7 +693,13 @@ public:
 	}
 
 	virtual void generate_tac(){
-
+		condition->generate_tac();
+		body->generate_tac();
+		this->place = "";
+		string t1 = getNewTemp();
+		string l1 = getNewLabel();
+		string l2 = getNewLabel();
+		this->code = l1 + ":\n" + condition->code + t1 + " = !" + condition->place + "\nif(" + t1 + ") goto "+ l2 + "\n" + body->code + "goto " + l1 + "\n" + l2 + ":\n" ;
 	}
 
 };
@@ -704,7 +739,14 @@ public:
 	}
 
 	virtual void generate_tac(){
-
+		
+		body->generate_tac();
+		this->place = "";
+		
+		string l1 = getNewLabel();
+		this->code = l1 + ":\n" + body->code;
+		condition->generate_tac();
+		this->code += condition->code + "\nif (" + condition->place + ") goto "+ l1 + "\n";
 	}
 
 };
@@ -756,7 +798,13 @@ public:
 	}
 
 	virtual void generate_tac(){
-
+		string s = "";
+		for(Statement* it : stmts->statements){
+			it->generate_tac();
+			s += it->code;
+		}
+		this->place = "";
+		this->code = s;
 	}
 
 };
