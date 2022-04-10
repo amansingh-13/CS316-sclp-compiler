@@ -3,8 +3,9 @@ int x, g;
 
 
 void main(){
-    int x, f;
-	int b;
+    int x, y;
+
+    x = x > 3 && ! y>=5 ? x*x*x/x : x+y/x;
 //    if(x!=0)
 //    if(x==0)
 //    if(x!=0)

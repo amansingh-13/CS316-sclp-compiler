@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <sstream>
+#include "tac.hpp"
 using namespace std;
 extern int yyerror(char *);
 
@@ -38,6 +39,8 @@ class AST {
 public:
 	string place;
 	string code;
+	vector<TAC_Stmt*> tac_stmt_list;
+
 	virtual string print(int num_spaces) = 0;
 	virtual int infer_type(SymTab* symtab) = 0;
 	virtual void generate_tac() = 0;
@@ -45,6 +48,7 @@ public:
 
 class Expression : public AST {
 public:
+	TAC_Opd* tac_result;
 	int type = -1;
 	virtual string print(int num_spaces) = 0;
 	virtual int infer_type(SymTab* symtab) = 0;
@@ -89,6 +93,8 @@ public:
 	virtual void generate_tac(){
 		this->code = "";
 		this->place = this->value+"_";
+
+		this->tac_result = new Variable_Opd(this->place, this->type);
 	}
 };
 
@@ -108,6 +114,8 @@ public:
 	virtual void generate_tac(){
 		this->code = "";
 		this->place = to_string(atoi(value.c_str()));
+
+		this->tac_result = new Int_Const_Opd(value, TYPE_INT);
 	}
 };
 
@@ -134,6 +142,8 @@ public:
         temp.precision(2);
         temp << fixed << parsed_val;
 		this->place = temp.str();
+
+		this->tac_result = new Float_Const_Opd(value, TYPE_FLOAT);
 	}
 };
 
@@ -152,6 +162,8 @@ public:
 	virtual void generate_tac(){
 		this->code = "";
 		this->place = this->value;
+
+		this->tac_result = new String_Const_Opd(value, TYPE_STRING);
 	}
 };
 
@@ -173,6 +185,29 @@ public:
 		yyerror("Type Mismatch\n");
 		return -1;
 	}
+
+	void binary_expr_generate_tac(string op_string, TAC_Op op_enum){
+		this->left->generate_tac();
+		this->right->generate_tac();
+		string var = getNewTemp();
+		string c3 = var + " = " + this->left->place + op_string + this->right->place + "\n";
+		this->place = var;
+		this->code = this->left->code + this->right->code + c3;
+
+		for(auto x : this->left->tac_stmt_list){
+			this->tac_stmt_list.push_back(x);
+		}
+		for(auto x : this->right->tac_stmt_list){
+			this->tac_stmt_list.push_back(x);
+		}
+		// delete this->left->tac_stmt_list ?  --This method is not very optimal anyways
+
+		this->tac_result = new Temporary_Opd(var, this->type);
+		TAC_Stmt* stmt = new TAC_Compute_Stmt(
+			this->tac_result, this->left->tac_result, op_enum, this->right->tac_result
+		);
+		this->tac_stmt_list.push_back(stmt);
+	}
 };
 
 class Div_Expr : public Binary_Expr {
@@ -187,12 +222,7 @@ public:
 	}	
 
 	virtual void generate_tac(){
-		this->left->generate_tac();
-		this->right->generate_tac();
-		string var = getNewTemp();
-		string c3 = var + " = " + this->left->place + " / " + this->right->place + "\n";
-		this->place = var;
-		this->code = this->left->code + this->right->code + c3;
+		binary_expr_generate_tac(" / ", Div_TAC_Op);
 	}
 };
 
@@ -208,14 +238,9 @@ public:
 	}	
 
 	virtual void generate_tac(){
-		this->left->generate_tac();
-		this->right->generate_tac();
-		string var = getNewTemp();
-		string c3 = var + " = " + this->left->place + " * " + this->right->place + "\n";
-		this->place = var;
-		this->code = this->left->code + this->right->code + c3;
+		binary_expr_generate_tac(" * ", Mult_TAC_Op);	
 	}
-	
+
 };
 
 class Minus_Expr : public Binary_Expr {
@@ -230,12 +255,7 @@ public:
 	}
 
 	virtual void generate_tac(){
-		this->left->generate_tac();
-		this->right->generate_tac();
-		string var = getNewTemp();
-		string c3 = var + " = " + this->left->place + " - " + this->right->place + "\n";
-		this->place = var;
-		this->code = this->left->code + this->right->code + c3;
+		binary_expr_generate_tac(" - ", Sub_TAC_Op);
 	}	
 };
 
@@ -251,12 +271,7 @@ public:
 	}	
 
 	virtual void generate_tac(){
-		this->left->generate_tac();
-		this->right->generate_tac();
-		string var = getNewTemp();
-		string c3 = var + " = " + this->left->place + " + " + this->right->place + "\n";
-		this->place = var;
-		this->code = this->left->code + this->right->code + c3;
+		binary_expr_generate_tac(" + ", Add_TAC_Op);
 	}
 };
 
@@ -266,6 +281,11 @@ private:
 		if      (op == "AND") return "&&";
 		else if (op == "OR" ) return "||";
 		else return "err"; // UNREACHABLE
+	}
+	TAC_Op get_tac_op_enum(){
+		if      (op == "AND") return And_TAC_Op;
+		else if (op == "OR" ) return Or_TAC_Op;
+		else return Err_TAC_Op; // UNREACHABLE
 	}
 public:
 	string op;
@@ -294,12 +314,7 @@ public:
 	}	
 
 	virtual void generate_tac(){
-		this->left->generate_tac();
-		this->right->generate_tac();
-		string var = getNewTemp();
-		string c3 = var + " = " + this->left->place + get_op_lexeme() + this->right->place + "\n";
-		this->place = var;
-		this->code = this->left->code + this->right->code + c3;
+		binary_expr_generate_tac(get_op_lexeme(), get_tac_op_enum());	
 	}
 };
 
@@ -313,6 +328,15 @@ private:
 		else if (op == "NE") return "!=";
 		else if (op == "EQ") return "==";
 		else return "err"; // UNREACHABLE
+	}
+	TAC_Op get_tac_op_enum(){
+		if      (op == "LT") return LT_TAC_Op;
+		else if (op == "LE") return LE_TAC_Op;
+		else if (op == "GT") return GT_TAC_Op;
+		else if (op == "GE") return GE_TAC_Op;
+		else if (op == "NE") return NE_TAC_Op;
+		else if (op == "EQ") return EQ_TAC_Op;
+		else return Err_TAC_Op; // UNREACHABLE
 	}
 public:
 	string op;
@@ -341,12 +365,7 @@ public:
 	}
 
 	virtual void generate_tac(){
-		this->left->generate_tac();
-		this->right->generate_tac();
-		string var = getNewTemp();
-		string c3 = var + " = " + this->left->place + " " + get_op_lexeme() + " " + this->right->place + "\n";
-		this->place = var;
-		this->code = this->left->code + this->right->code + c3;
+		binary_expr_generate_tac(get_op_lexeme(), get_tac_op_enum());	
 	}
 };
 
@@ -387,6 +406,17 @@ public:
 		string c3 = var + " = " + " - " + this->expression->place + "\n";
 		this->place = var;
 		this->code = this->expression->code + c3;
+
+		for(auto x : this->expression->tac_stmt_list){
+			this->tac_stmt_list.push_back(x);
+		}
+		// delete this->expression->tac_stmt_list ?  --This method is not very optimal anyways
+
+		this->tac_result = new Temporary_Opd(var, this->type);
+		TAC_Stmt* stmt = new TAC_Compute_Stmt(
+			this->tac_result, NULL, UMinus_TAC_Op, this->expression->tac_result
+		);
+		this->tac_stmt_list.push_back(stmt);
 	}
 
 };
@@ -422,6 +452,17 @@ public:
 		string c3 = var + " = " + "!" + this->expression->place + "\n";
 		this->place = var;
 		this->code = this->expression->code + c3;
+
+		for(auto x : this->expression->tac_stmt_list){
+			this->tac_stmt_list.push_back(x);
+		}
+		// delete this->expression->tac_stmt_list ?  --This method is not very optimal anyways
+
+		this->tac_result = new Temporary_Opd(var, this->type);
+		TAC_Stmt* stmt = new TAC_Compute_Stmt(
+			this->tac_result, NULL, Not_TAC_Op, this->expression->tac_result
+		);
+		this->tac_stmt_list.push_back(stmt);
 	}
 
 };
@@ -488,6 +529,32 @@ public:
 					+ t2 + " = " + expression3->place + "\n"  \
 					+ l2 + ": \n";
 		this->place = t2;
+
+		TAC_Opd* cond = new Temporary_Opd(t1, TYPE_BOOL);
+		Variable_Opd* result = new Variable_Opd(t2, this->type);
+		Label_Opd* tac_l1 = new Label_Opd(l1);
+		Label_Opd* tac_l2 = new Label_Opd(l2);
+
+		this->tac_result = result;
+
+		for(auto x : this->expression1->tac_stmt_list)
+			this->tac_stmt_list.push_back(x);
+
+		this->tac_stmt_list.push_back(new TAC_Compute_Stmt(cond, NULL, Not_TAC_Op, this->expression1->tac_result));
+		this->tac_stmt_list.push_back(new TAC_If_Stmt(cond, tac_l1));
+
+		for(auto x : this->expression2->tac_stmt_list)
+			this->tac_stmt_list.push_back(x);
+
+		this->tac_stmt_list.push_back(new TAC_Asgn_Stmt(result, this->expression2->tac_result));
+		this->tac_stmt_list.push_back(new TAC_Goto_Stmt(tac_l2));
+		this->tac_stmt_list.push_back(new TAC_Label_Stmt(tac_l1));
+
+		for(auto x : this->expression2->tac_stmt_list)
+			this->tac_stmt_list.push_back(x);
+		
+		this->tac_stmt_list.push_back(new TAC_Asgn_Stmt(result, this->expression3->tac_result));
+		this->tac_stmt_list.push_back(new TAC_Label_Stmt(tac_l2));
 	}
 };
 

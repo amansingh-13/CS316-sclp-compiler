@@ -11,6 +11,6 @@ lex.yy.o : lexer.l y.tab.h
 	g++ -g -std=c++11 -c lex.yy.c -w
 
 clean:
-	rm -f lex.yy.* y.tab.* y.output a.out sclp *.log *.toks *.ast *.tac
+	rm -f lex.yy.* y.tab.* y.output a.out sclp *.log *.toks *.ast *.tac *.rtl
 
 	
